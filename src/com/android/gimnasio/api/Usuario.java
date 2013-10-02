@@ -16,7 +16,7 @@ public class Usuario {
 	public Usuario(Context context){
 		
 		this.context=context;
-		this.crearUsuario(0,"alexis","miranda",21,(float)1.78,70,0);
+		//this.crearUsuario(0,"alexis","miranda",21,(float)1.78,70,0);
 	}
 	public void crearUsuario(int id_usuario,String nombre,String apellido,int edad,float estatura,float peso,int sexo)
 	{

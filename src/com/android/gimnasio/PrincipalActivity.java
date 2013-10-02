@@ -29,7 +29,7 @@ public class PrincipalActivity extends Activity {
 		text=(TextView)findViewById(R.id.text);
 		Usuario u=new Usuario(this);
 		String resultados=u.getConsultaToString("select * from usuario");
-		text.setText("dneudne => \n"+resultados);
+		text.setText("Usuarios creados=> \n"+resultados);
 		
 	}
 
@@ -53,9 +53,6 @@ public class PrincipalActivity extends Activity {
 			u.eliminarUsuario(j);
 		*/
 		
-		
-		Intent intent=new Intent(this,FormularioUsuarioActivity.class);
-		startActivity(intent);
 		
 	}
 	

@@ -27,14 +27,6 @@
         android:layout_marginTop="88dp"
         android:text="@string/hello_world" />
 
-<Button
-    android:id="@+id/button1"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="103dp"
-     android:layout_marginLeft="97dp"
-    android:onClick="enviar"
-    android:text="Button" />
 
             </LinearLayout>
         </ScrollView>
