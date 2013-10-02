@@ -1,5 +1,7 @@
 package com.android.gimnasio;
 
+import java.util.HashMap;
+
 import com.android.gimnasio.api.AdminSQLiteOpenHelper;
 
 import android.app.Activity;
@@ -17,21 +19,12 @@ public class HomeActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 		
-		
 	}
 
 	public void enviar(View view){
-		Log.d("Create table", "Entre en la shit");
-
-		AdminSQLiteOpenHelper admin=new AdminSQLiteOpenHelper(this,null,0);
-		SQLiteDatabase bd = admin.getWritableDatabase();
-		Log.d("Create table", "Entre en la shit");
-
-		Log.d("Create table usuario", ""+admin.getCreateTable("usuario", admin.getColumnasUsuario2()));
-		//Log.d("Create table", ""+admin.getCreateTable("maquina", admin.getColunasMaquina()));
-		/*Intent intent=new Intent(this,FormularioUsuarioActivity.class);
+		Intent intent=new Intent(this,FormularioUsuarioActivity.class);
 		startActivity(intent);
-	*/	
+	
 	}
 	
 

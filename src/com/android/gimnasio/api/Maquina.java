@@ -23,13 +23,12 @@ public class Maquina {
 		bd.insert("maquina", null, values);
 		bd.close();
 	}
-	public void setNombre(int id_maquina,String nombre)
+	public void editarMaquina(int id_maquina,ContentValues columnas)
 	{
-		
-	}
-	public void setTipoDeMaquina(int id_maquina,String tipo_de_maquina)
-	{
-		
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		bd.update("maquina", columnas, "id_maquina='"+id_maquina+"'", null);
+		bd.close();
 	}
 	public String getNombre(int id_maquina)
 	{
@@ -77,12 +76,7 @@ public class Maquina {
 	public void eliminar(){
 		
 	}
-	public void setNombre(){
-		
-	}
-	public void setTipoDeMaquina(){
-		
-	}
+
 
 
 }

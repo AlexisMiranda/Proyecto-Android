@@ -2,13 +2,16 @@ package com.android.gimnasio.api;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import android.R.integer;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class Usuario {
 
@@ -16,7 +19,8 @@ public class Usuario {
 	public Usuario(Context context){
 		
 		this.context=context;
-		//this.crearUsuario(0,"alexis","miranda",21,(float)1.78,70,0);
+    	this.crearUsuario(0,"alexis","miranda", 22,(float) 1.76,(float)70, 0);
+
 	}
 	public void crearUsuario(int id_usuario,String nombre,String apellido,int edad,float estatura,float peso,int sexo)
 	{
@@ -38,51 +42,19 @@ public class Usuario {
 		bd.close();
 	}
 
-	public void setNombreApellido(int  id_usuario,String nombre,String apellido){
-		
-		ContentValues update=new ContentValues();
-		if(!nombre.equals(""))
-			update.put("nombre",nombre);
-		if(!apellido.equals(""))
-			update.put("apellido",apellido);
-		if(update.size()>0){
-			AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-			SQLiteDatabase bd = admin.getWritableDatabase();
-			bd.update("usuario", update, "id_usuario='"+id_usuario+"'", null);
-			//bd.execSQL("update usuario set nombre='"+nombre+"' where  id_usuario='"+ id_usuario+"'");		
-			bd.close();
-		}
-	}
-
-	public void setSexo(int  id_usuario,int sexo){
+	/*Ejemplo
+	 * Usuario u = new Usuario(this);
+	 * ContenValues columnas=new ContentValues();
+	 * columnas.put("nombre","juanito");
+	 * columnas.put("edad",24)
+	 * u.update(1,columnas);
+	 */
+	public void editarUsuario(int id_usuario,ContentValues columnas)
+	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
-		bd.execSQL("update usuario set sexo='"+sexo+"' where  id_usuario='"+ id_usuario+"'");		
-	    bd.close();
-	}
-	public void setEdad(int  id_usuario,int edad){
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getWritableDatabase();
-		bd.execSQL("update usuario set edad='"+edad+"' where  id_usuario='"+ id_usuario+"'");		
-	    bd.close();
-	}
-	public void setEstatura(int  id_usuario,float estatura){
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getWritableDatabase();
-		bd.execSQL("update usuario set estatura='"+estatura+"' where  id_usuario='"+ id_usuario+"'");		
-	    bd.close();
-	}
-	public void setPeso(int  id_usuario,float peso){
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getWritableDatabase();
-		bd.execSQL("update usuario set peso='"+peso+"' where  id_usuario='"+ id_usuario+"'");		
-	    bd.close();
-	}
-	public void setPuntaje(int  id_usuario,int puntaje){
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getWritableDatabase();
-		bd.execSQL("update usuario set puntaje='"+puntaje+"' where  id_usuario='"+ id_usuario+"'");		
-	    bd.close();
+		bd.update("usuario", columnas, "id_usuario="+id_usuario, null);
+		bd.close();
 	}
 	public String getNombre(int id_usuario){
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
@@ -158,19 +130,27 @@ public class Usuario {
 		return ids_usuarios;
 	}
 	
-	public ArrayList<String> getColumnas()
+	public HashMap<String, String> getColumnas()
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
+		HashMap<String, String> r_columnas=new HashMap<String, String>();
+		return admin.getColumnasUsuario();
 
-		ArrayList<String> r_columnas=new ArrayList<String>();
-		String[] columnas=admin.getColumnasUsuario();
-		for(int i=0;i<columnas.length;i++)
-		{
-			r_columnas.add(columnas[i]);
-		}
-		return r_columnas;
+	}
+	public boolean existeUsuario(int id_usuario)
+	{
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+		SQLiteDatabase bd = admin.getReadableDatabase();
+		Cursor resultados = bd.rawQuery("select * from usuario where id_usuario="+id_usuario, null);
+		if (resultados.moveToFirst()){
+			Log.d("existe usuario","True ");
+			return true;
+		}			
+		Log.d("existe usuario","false ");
+
 		
+		return false;
 	}
 	public String getConsultaToString(String query)
 	{
@@ -184,7 +164,7 @@ public class Usuario {
 			{
 			for(int i=0;i<resultados.getColumnCount();i++)
 				{			
-				res+=resultados.getString(i)+"\t";
+				res+=resultados.getColumnName(i)+resultados.getString(i)+"\t";
 				}
 			res+="\n";
 			}
@@ -195,6 +175,7 @@ public class Usuario {
 		return "";
 			
 	}
+	
 	public void eliminarUsuario(int id_usuario)
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);

@@ -10,6 +10,7 @@ import com.android.gimnasio.api.*;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
@@ -34,10 +35,10 @@ public class PrincipalActivity extends Activity {
 	}
 
 	public void enviar(View view){
-		
 
 		//tabla maquina
-		Usuario u=new Usuario(this);
+		//Usuario u=new Usuario(this);
+		
 		/*Maquina maquina=new Maquina(this);
 		for(int i=0;i<2;i++)		
 			u.crearUsuario(-1, "usuario "+i, "apellido "+i, i, 1,i, 0);
