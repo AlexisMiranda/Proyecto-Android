@@ -14,10 +14,7 @@ import android.util.Log;
 public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
 
 	private static String nombre_db="gimnasio";
-	/*private static String[] columnas_maquina={"id_maquina","nombre","tipo_de_maquina"};
-	private static String[] columnas_usuario={"id_usuario","nombre","apellido","sexo",
-												"estatura","peso","edad","imc","puntaje"};
-												*/
+
 	private HashMap<String, String> columnas_usuario,columnas_maquina;
 	
 	public AdminSQLiteOpenHelper(Context context,CursorFactory factory, int version) 
@@ -29,8 +26,7 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) 
 	{
-		db.execSQL(this.getCreateTable("usuario", this.getColumnasUsuario()));
-		db.execSQL(this.getCreateTable("maquina", this.getColumnasMaquina()));
+		db.execSQL(this.getCreateTable(Maquina.nombre_tabla, Maquina.getColumnas()));
 	}
 
 	@Override
@@ -38,38 +34,10 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
 	{
 		db.execSQL("drop table if exists maquina");
 		db.execSQL("drop table if exists usuario");
-		db.execSQL(this.getCreateTable("usuario", this.getColumnasUsuario()));
-		db.execSQL(this.getCreateTable("maquina", this.getColumnasMaquina()));
+		db.execSQL(this.getCreateTable(Usuario.nombre_tabla, Usuario.getColumnas()));
+		db.execSQL(this.getCreateTable(Maquina.nombre_tabla, Maquina.getColumnas()));
 	}
-	public HashMap<String, String> getColumnasUsuario()
-	{
-		/*
-		 * Segun el orden en el que se agregan al hash es en e orden en que se mostraran en el 
-		 * formulario
-		 */
-		
-		columnas_usuario=new HashMap<String, String>();
-		columnas_usuario.put("id_usuario"," integer primary key AUTOINCREMENT");
-		columnas_usuario.put("peso","real");
-		columnas_usuario.put("edad","integer");
-		columnas_usuario.put("estatura","real");
-		columnas_usuario.put("apellido","text");
-		columnas_usuario.put("sexo","integer");
-		columnas_usuario.put("nombre","text");
-		columnas_usuario.put("imc","real");
-		columnas_usuario.put("puntaje","integer");
-		return columnas_usuario;
 
-	}
-	public HashMap<String, String> getColumnasMaquina()
-	{
-		columnas_maquina=new HashMap<String, String>();
-		columnas_maquina.put("id_maquina","integer primary key AUTOINCREMENT");
-		columnas_maquina.put("nombre","text");
-		columnas_maquina.put("tipo_de_maquina","text");
-		return columnas_maquina;
-
-	}
 	public String getCreateTable(String tabla,HashMap<String,String> columnas)
 	{
 

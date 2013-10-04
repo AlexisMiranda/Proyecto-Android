@@ -16,9 +16,23 @@ import android.util.Log;
 public class Usuario {
 
 	private Context context;
+	public static final String nombre_tabla="usuario";
+	public static final String[] primary_key={"id_usuario","integer primary key AUTOINCREMENT"};
+	public static final String[]  nombre={"nombre","text"};
+	public static final String[]  apellido={"apellido","text"};
+	public static final String[]  edad={"edad","integer"};
+	public static final String[]  peso={"peso","real"};
+	public static final String[] estatura={"estatura","real"};
+	public static final String[]  sexo={"sexo","integer"};
+	public static final String[]  puntaje={"puntaje","integer"};
+	public static final String[]  imc={"imc","real"};
+
+	private static final String[][] columnas={primary_key,puntaje,edad,
+											peso,estatura,sexo,apellido,nombre,imc};
+	
 	public Usuario(Context context){
 		
-		this.context=context;
+		this.context=context;		
     	this.crearUsuario(0,"alexis","miranda", 22,(float) 1.76,(float)70, 0);
 
 	}
@@ -27,19 +41,34 @@ public class Usuario {
 		
 		ContentValues values=new ContentValues();
 		if(id_usuario>=0)
-			values.put("id_usuario", id_usuario);
-		values.put("nombre", nombre);
-		values.put("apellido", apellido);
-		values.put("edad", edad);
-		values.put("estatura", estatura);
-		values.put("peso", peso);	
-		values.put("sexo", sexo);
-		values.put("imc", (peso/(estatura*estatura)));
+			values.put(Usuario.primary_key[0], id_usuario);
+		values.put(Usuario.nombre[0], nombre);
+		values.put(Usuario.apellido[0], apellido);
+		values.put(Usuario.edad[0], edad);
+		values.put(Usuario.estatura[0], estatura);
+		values.put(Usuario.peso[0], peso);	
+		values.put(Usuario.sexo[0], sexo);
+		values.put(Usuario.imc[0], (peso/(estatura*estatura)));
 		values.put("puntaje",0);
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.insert("usuario", null, values);
 		bd.close();
+	}
+	public boolean crearUsuario(int id_usuario,ContentValues cv_columnas)
+	{
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		Iterator<String> i=getColumnas().keySet().iterator();
+		while(i.hasNext())
+		{
+			if(!(cv_columnas.containsKey(i.next()))){
+				return false;
+			}
+		}
+		bd.insert("usuario", null, cv_columnas);
+		bd.close();
+		return true;
 	}
 
 	/*Ejemplo
@@ -53,13 +82,13 @@ public class Usuario {
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
-		bd.update("usuario", columnas, "id_usuario="+id_usuario, null);
+		bd.update(this.nombre_tabla, columnas, "id_usuario="+id_usuario, null);
 		bd.close();
 	}
 	public String getNombre(int id_usuario){
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getReadableDatabase();
-		String nombre=bd.rawQuery("select nombre from usuario where id_usuario="+id_usuario,null).getString(0);
+		String nombre=bd.rawQuery("select nombre from "+this.nombre_tabla+" where id_usuario="+id_usuario,null).getString(0);
 		bd.close();
 		return nombre;
 	}
@@ -117,8 +146,8 @@ public class Usuario {
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
-		Cursor resultado=bd.rawQuery("select id_usuario from usuario",null);
-		ArrayList<Integer> ids_usuarios=new ArrayList();
+		Cursor resultado=bd.rawQuery("select "+primary_key[0]+" from "+nombre_tabla,null);
+		ArrayList<Integer> ids_usuarios=new ArrayList<Integer>();
 		if (resultado.moveToFirst())
 		{
 			while(resultado.moveToNext())
@@ -130,26 +159,27 @@ public class Usuario {
 		return ids_usuarios;
 	}
 	
-	public HashMap<String, String> getColumnas()
+	public static final HashMap<String, String> getColumnas()
 	{
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getWritableDatabase();
-		HashMap<String, String> r_columnas=new HashMap<String, String>();
-		return admin.getColumnasUsuario();
+		HashMap<String, String>columnas_usuario=new HashMap<String, String>();
+		for(int i=0;i<Usuario.columnas.length;i++)
+		{
+				columnas_usuario.put(columnas[i][0],columnas[i][1]);
+		
+		}
+		return columnas_usuario;
 
 	}
 	public boolean existeUsuario(int id_usuario)
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getReadableDatabase();
-		Cursor resultados = bd.rawQuery("select * from usuario where id_usuario="+id_usuario, null);
+		Cursor resultados = bd.rawQuery("select * from "+nombre_tabla+" where "+primary_key[0]+"="+id_usuario, null);
 		if (resultados.moveToFirst()){
-			Log.d("existe usuario","True ");
+			Log.d("existe "+Usuario.class,"True");
 			return true;
-		}			
-		Log.d("existe usuario","false ");
-
-		
+		}	
+		Log.d("existe "+Usuario.class,"False");
 		return false;
 	}
 	public String getConsultaToString(String query)
@@ -180,7 +210,7 @@ public class Usuario {
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
-		bd.execSQL("delete from usuario where id_usuario="+id_usuario);
+		bd.execSQL("delete from "+nombre_tabla+" where "+primary_key[0]+"="+id_usuario);
 	}
 
 }
