@@ -33,15 +33,14 @@ public class Usuario {
 	public Usuario(Context context){
 		
 		this.context=context;		
-    	this.crearUsuario(0,"alexis","miranda", 22,(float) 1.76,(float)70, 0);
-
 	}
 	public void crearUsuario(int id_usuario,String nombre,String apellido,int edad,float estatura,float peso,int sexo)
 	{
 		
 		ContentValues values=new ContentValues();
-		if(id_usuario>=0)
+		if(id_usuario>0)
 			values.put(Usuario.primary_key[0], id_usuario);
+		Log.d("entro a crear","CRE");
 		values.put(Usuario.nombre[0], nombre);
 		values.put(Usuario.apellido[0], apellido);
 		values.put(Usuario.edad[0], edad);
@@ -93,10 +92,9 @@ public class Usuario {
 		return nombre;
 	}
 	public String getApellido(int id_usuario){
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getReadableDatabase();
-		String apellido=bd.rawQuery("select apellido from usuario where id_usuario="+id_usuario,null).getString(0);
-		bd.close();
+		Log.d("Antes de la query","Entre en getApellido");
+		String apellido=getConsultaToString("select apellido from usuario where id_usuario="+id_usuario);
+		Log.d("despues de la query","Entre en getApellido");
 		return apellido;
 	}
 	public int getSexo(int id_usuario){
@@ -187,9 +185,10 @@ public class Usuario {
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getReadableDatabase();
 		Cursor resultados = bd.rawQuery(query, null);
-		if (resultados.moveToFirst()) 
+		if (resultados.getCount()>0) 
 		{
 			String res="";
+			Log.d("entre en if","*****");
 			while(resultados.moveToNext())
 			{
 			for(int i=0;i<resultados.getColumnCount();i++)
