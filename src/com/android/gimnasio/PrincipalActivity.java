@@ -22,6 +22,7 @@ public class PrincipalActivity extends Activity {
 
 	private TextView text;
 	private HashMap<String,String> t_maquina_columnas;
+	//linea de ejemplo con branches
 	final static String ACT_INFO = "com.android.gimnasio.PrincipalActivity";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
