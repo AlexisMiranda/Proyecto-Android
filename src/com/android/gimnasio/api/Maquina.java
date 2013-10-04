@@ -41,11 +41,9 @@ public class Maquina {
 	}
 	public String getNombre(int id_maquina)
 	{
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getReadableDatabase();
-		String nombre=bd.rawQuery("select "+Maquina.nombre[0]+" from "+Maquina.nombre_tabla+" where "+Maquina.primary_key[0]+" = "+id_maquina,null).getString(0);
-		bd.close();
-		return nombre;
+		
+		return getConsultaToString("select "+Maquina.nombre[0]+" from "+Maquina.nombre_tabla+" where "+Maquina.primary_key[0]+" = "+id_maquina);
+	
 	}
 	public String getTipoDeMaquina(int id_maquina)
 	{

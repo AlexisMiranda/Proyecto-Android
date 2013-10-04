@@ -132,6 +132,7 @@ public class FormularioUsuarioActivity extends Activity {
             			valores_columnas.put("sexo",sexo);            			
             		usuario.editarUsuario(1, valores_columnas);
             		}else{//si no existe lo creo
+            			Log.d("CREO USUARIO","CRE");
             			usuario.crearUsuario(1, nombre, apellido, edad, estatura, peso, sexo);
             		}
             		Intent intent =new Intent(getApplicationContext(),PrincipalActivity.class);

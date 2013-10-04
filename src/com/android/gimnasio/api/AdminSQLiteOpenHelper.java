@@ -20,13 +20,14 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
 	public AdminSQLiteOpenHelper(Context context,CursorFactory factory, int version) 
 	{
 		super(context,nombre_db , factory, version);
-		
+		 
 	}
 
 	@Override
 	public void onCreate(SQLiteDatabase db) 
 	{
 		db.execSQL(this.getCreateTable(Maquina.nombre_tabla, Maquina.getColumnas()));
+		db.execSQL(this.getCreateTable(Usuario.nombre_tabla, Usuario.getColumnas()));
 	}
 
 	@Override
