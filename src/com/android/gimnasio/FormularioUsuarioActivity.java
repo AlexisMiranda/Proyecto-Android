@@ -52,7 +52,8 @@ public class FormularioUsuarioActivity extends Activity {
 	private float  estatura, peso;
 	private RadioButton hombre,mujer;
 	private ImageView titulo;
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_formulario_usuario);
 		linear_layout=(LinearLayout)findViewById(R.id.linear_layout);
