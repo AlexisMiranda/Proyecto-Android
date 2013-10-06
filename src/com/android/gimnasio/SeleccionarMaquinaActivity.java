@@ -20,6 +20,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.DropBoxManager.Entry;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,7 @@ public class SeleccionarMaquinaActivity extends Activity{
 	private ArrayList<Integer> ids,idste,ids2;
 	private LinearLayout l1;
 	private ImageView img;
-	private int num_row=0;
+	private int num_row=0,width,heigth;
 	private Button siguiente;
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -72,12 +73,87 @@ public class SeleccionarMaquinaActivity extends Activity{
 				
 			}
 		});
-		int divisible=ids.size()/2;
+		width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160, getResources().getDisplayMetrics());
+		heigth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 120, getResources().getDisplayMetrics());
+		int num_filas=ids.size()/2;
 		int resto=ids.size()%2;
-		int cnt=0,i=0;
+		int cnt=0,num_maquina=0,num_linear,i=0;
 		this.llenar_encabezado();
-	   
-		for (int fila = 0; fila <divisible; fila++) 
+		
+	for(int fila=0;fila<num_filas;fila++)
+		{
+			num_linear=1;
+			if(fila%2==0)
+			{
+			num_linear=0;
+			}
+				
+			LinearLayout l2=new LinearLayout(this);
+			l2.setOrientation(LinearLayout.HORIZONTAL);
+			l2.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+			for(int columna=0;columna<2;columna++)
+			  	{    
+					Log.d(""+columna,""+maquina.getNombre(ids.get(num_maquina)));
+					switch (num_linear) 
+					{
+			    		case 0:
+			    			l2.addView(this.crearCheckbox(num_maquina));
+						break;
+			    		case 1:
+							l2.addView(this.crear_ImageView(num_maquina));
+						break;
+			    		default:
+						break;
+					}
+				    num_maquina+=1;
+
+				}
+			l1.addView(l2,num_row);
+			 num_row+=1;
+		}
+	l1.addView(siguiente,num_row);
+	}
+		
+	
+	public ImageView crear_ImageView(int num_maquina)
+	{
+		ImageView addBtn = new ImageView(this);
+		
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, heigth);
+        addBtn.setLayoutParams(layoutParams);
+		addBtn.setImageBitmap(maquina.getImagen(ids.get(num_maquina), this));
+		return addBtn;
+	}
+		
+	public CheckBox crearCheckbox(int num_maquina)
+	{
+		CheckBox checkBox = new CheckBox(this);
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, heigth);
+        checkBox.setLayoutParams(layoutParams);
+		checkBox.setGravity(Gravity.CENTER);
+		checkBox.setText(maquina.getNombre(ids.get(num_maquina)));
+		checkBox.setTextSize(10);
+		checkBox.setId(ids.get(num_maquina));
+		
+		checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() 
+		{
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) 
+			{
+			       if (buttonView.isChecked()) 
+			       {
+                         Toast.makeText(getBaseContext(),  "checkeado "+buttonView.getId(),Toast.LENGTH_SHORT).show();
+                   }						
+			}
+          });
+		return checkBox;
+	}
+	
+		
+
+	 /*  
+		for (int fila = 0; fila <num_filas; fila++) 
 		{
 			 LinearLayout l2=new LinearLayout(this);
 			    l2.setOrientation(LinearLayout.HORIZONTAL);
@@ -102,7 +178,7 @@ public class SeleccionarMaquinaActivity extends Activity{
 	                  });
 				l2.addView(checkBox);
 		        ImageView addBtn = new ImageView(this);
-		        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(150, 300);
+		       LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, 300);
 		        addBtn.setLayoutParams(layoutParams);
 		        addBtn.setImageBitmap(maquina.getImagen(ids.get(i), this));
 		        i+=1;
@@ -120,7 +196,7 @@ public class SeleccionarMaquinaActivity extends Activity{
 		for (int col = 0; col <resto; col++) {
 			CheckBox checkBox = new CheckBox(this);
 	        ImageView addBtn = new ImageView(this);
-	        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(150, 300);
+	        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, 300);
 	        addBtn.setLayoutParams(layoutParams);
 	        addBtn.setImageBitmap(maquina.getImagen(ids.get(i), this));
 	        i+=1;
@@ -134,8 +210,8 @@ public class SeleccionarMaquinaActivity extends Activity{
 		 num_row+=1;
 		 l1.addView(siguiente,num_row);
 		 num_row+=1;
-
-	}
+*/
+	
 
 	
 	public void llenar_encabezado()
