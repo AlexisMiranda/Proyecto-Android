@@ -14,6 +14,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
@@ -30,8 +31,18 @@ public class PrincipalActivity extends Activity {
 		setContentView(R.layout.activity_principal);
 		text=(TextView)findViewById(R.id.text);
 		Usuario u=new Usuario(this);
-		String resultados=u.getConsultaToString("select * from usuario");
-		text.setText("Usuarios creados=> \n"+resultados);
+		Maquina m=new Maquina(this);
+		String resultados_u=u.getConsultaToString("select * from usuario where id=1");
+		//String resultados_m=m.getConsultaToString("select * from maquina");
+		//datos_usuario.put("nombre",this.usuario.getConsultaToString("select * from usuario"));
+		//datos_usuario.put("Nombre",""+u.getNombre(ids_usuarios.get(0)));
+		Log.d("todo",resultados_u);
+		Log.d("nombre", "entredede= "+u.getNombre(1));
+		Log.d("Peso", ""+u.getPeso(1));
+		Log.d("Estatura", ""+u.getEstatura(1));
+		Log.d("Edad", ""+u.getEdad(1));
+		Log.d("Imc", " "+u.getImc(1));
+		text.setText("Usuarios creados=> \n"+resultados_u);
 		
 	}
 

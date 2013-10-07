@@ -13,7 +13,10 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -25,6 +28,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
@@ -36,16 +40,17 @@ public class FormularioUsuarioActivity extends Activity {
 
 	
 	private LinearLayout linear_layout;
-	private FrameLayout frame_layout;
+	private LinearLayout titulo_layout;
 	private Button submit;
 	private Usuario usuario;
 	private ContentValues valores_a_insertar;
 	private HashMap<String, String> hash_columnas=new HashMap<String, String>();	
 	private HashMap<String, EditText> edit_text_hash=new HashMap<String, EditText>();
 	private int sexo, edad;
-	private String nombre, apellido;
+	private String nombre;
 	private float  estatura, peso;
 	private RadioButton hombre,mujer;
+	private ImageView titulo;
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_formulario_usuario);
@@ -54,31 +59,34 @@ public class FormularioUsuarioActivity extends Activity {
 		submit.setText("Ingresar");
 		submit.setHeight(30);
 		linear_layout.setPadding(20, 0, 20, 0);
-		frame_layout=new FrameLayout(this);
-		frame_layout.setPadding(400, 100, 100, 100);
-		linear_layout.addView(frame_layout);
+		titulo_layout=new LinearLayout(this);
+		titulo_layout.setPadding(400, 100, 100, 100);
+		titulo=new ImageView(this);
+		titulo.setPadding(100, 0, 100,10);
+		titulo.setLayoutParams(new LinearLayout.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT));
+		titulo.setImageResource(R.drawable.titulo_tu_informacion);
+		linear_layout.addView(titulo);
 		usuario=new Usuario(this);
 
 		hash_columnas=usuario.getColumnas();
 		//elimino puntaje, imc y id_usuario
-		hash_columnas.remove("id_usuario");
-		hash_columnas.remove("imc");
-		hash_columnas.remove("puntaje");
+		hash_columnas.remove(Usuario.id_primaryKey_0);
+		hash_columnas.remove(Usuario.imc_float_8);
+		hash_columnas.remove(Usuario.puntaje_float_7);
 		
 		Iterator<String> key_columnas=hash_columnas.keySet().iterator();
-		int top=5,cnt_edit=hash_columnas.size(),i=0;
-		Log.d("empiezo while","inicio "+cnt_edit);
+		int cnt_edit=hash_columnas.size(),i=0;
 		while(key_columnas.hasNext())
 		{
 			
 			TextView text_view=new TextView(this);
-			Log.d("cree text view","view "+cnt_edit);
-
 			String columna=key_columnas.next();
-			Log.d("Columna agregada","");
 			text_view.setText(columna.substring(0,1).toUpperCase()+columna.substring(1));
-			text_view.setPadding(10, top=+2, 100, 10);
+			text_view.setPadding(10, 0, 100, 10);
 			text_view.setId(i=+1);
+			text_view.setTextColor(Color.parseColor("#585858"));
 			EditText edit_text=new EditText(this);
 			edit_text.setId(cnt_edit=+1);
 			edit_text.setFocusable(true);
@@ -92,50 +100,59 @@ public class FormularioUsuarioActivity extends Activity {
 			//seteo el tipo de campo input
 			if((hash_columnas.get(columna).contains("integer")))
 			{
-				if(columna.contains("sexo")){
+				if(columna.contains(Usuario.sexo_int_5)){
 					this.logicaSexo();
 					break;//siguiente columna
 					
 				}else{
 				edit_text.setInputType(InputType.TYPE_CLASS_NUMBER);
+				edit_text.setFilters(new InputFilter[] {new InputFilter.LengthFilter(3)});
+
 				}
 			}else if ((hash_columnas.get(columna).contains("text"))) {
 				edit_text.setInputType(InputType.TYPE_CLASS_TEXT);
+				edit_text.setFilters(new InputFilter[] {new InputFilter.LengthFilter(50)});
 			}else if ((hash_columnas.get(columna).contains("date"))) {
 				edit_text.setInputType(InputType.TYPE_CLASS_DATETIME);
 			}else if((hash_columnas.get(columna).contains("real")))
 					{
 				edit_text.setHorizontallyScrolling(true);
 				edit_text.setInputType(EditorInfo.TYPE_CLASS_NUMBER|EditorInfo.TYPE_NUMBER_FLAG_DECIMAL);
+				edit_text.setFilters(new InputFilter[] {new InputFilter.LengthFilter(5)});
+
 					}
 			
 			
 			linear_layout.addView(edit_text);
 		}
 		linear_layout.addView(new TextView(this));
-		linear_layout.addView(new TextView(this));
 		linear_layout.addView(submit);
 		submit.setOnClickListener(new View.OnClickListener()
 		{
+			
             public void onClick(View v) 
             {
             	if(validadores())
             	{
+        			Log.d("Pase validadores","CRE");
+
             		if(usuario.existeUsuario(1))//si existe lo edito
             		{
+            			Log.d("edito USUARIO","CRE");
             			ContentValues valores_columnas=new ContentValues();
-            			valores_columnas.put("nombre",nombre);
-            			valores_columnas.put("apellido",apellido);
-            			valores_columnas.put("edad",edad);
-            			valores_columnas.put("estatura",estatura);
-            			valores_columnas.put("peso",peso);
-            			valores_columnas.put("sexo",sexo);            			
+            			valores_columnas.put(Usuario.nombre_str_1,nombre);
+            			valores_columnas.put(Usuario.edad_int_3,edad);
+            			valores_columnas.put(Usuario.estatura_float_4,estatura);
+            			valores_columnas.put(Usuario.peso_float_6,peso);
+            			valores_columnas.put(Usuario.sexo_int_5,sexo); 
+            			valores_columnas.put(Usuario.imc_float_8, peso/(estatura*estatura));
+            			Log.d("Usuario actualizado",""+valores_columnas.toString());
             		usuario.editarUsuario(1, valores_columnas);
             		}else{//si no existe lo creo
             			Log.d("CREO USUARIO","CRE");
-            			usuario.crearUsuario(1, nombre, apellido, edad, estatura, peso, sexo);
+            			usuario.crearUsuario(1, nombre,edad, estatura, peso, sexo);
             		}
-            		Intent intent =new Intent(getApplicationContext(),PrincipalActivity.class);
+            		Intent intent =new Intent(getApplicationContext(),SeleccionarMaquinaActivity.class);
             		startActivity(intent);
             	}
             }
@@ -156,6 +173,7 @@ public class FormularioUsuarioActivity extends Activity {
 		{
 			String columna=key_columnas.next();
 			Log.d("validador***",""+columna);
+			int caracteres_minimos;
 			if(this.edit_text_hash.get(columna).getText().toString().equals(""))//si el campo esta vacio esta vacia
 			{
 				Log.d("error vacio ",""+columna);
@@ -169,8 +187,6 @@ public class FormularioUsuarioActivity extends Activity {
 
 		Log.d("Nombre= ",""+this.edit_text_hash.get("nombre").getText().toString());
     	this.nombre=this.edit_text_hash.get("nombre").getText().toString();
-    	Log.d("apellido= ",""+this.edit_text_hash.get("apellido").getText().toString());
-    	this.apellido=this.edit_text_hash.get("apellido").getText().toString();
     	Log.d("edad= ",""+this.edit_text_hash.get("edad").getText().toString());
     	this.edad=Integer.parseInt(this.edit_text_hash.get("edad").getText().toString());
     	Log.d("estatura= ",""+this.edit_text_hash.get("estatura").getText().toString());
@@ -198,21 +214,18 @@ public class FormularioUsuarioActivity extends Activity {
             @Override
             public void onClick(View v) {sexo=1;hombre.setChecked(false);mujer.setChecked(true);}});
 		Log.d("Linear empezo","edueduede");
-		LinearLayout linear_hombre=new LinearLayout(this);
+		//LinearLayout linear_hombre=new LinearLayout(this);
 		LinearLayout linear_mujer=new LinearLayout(this);
-		linear_hombre.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT));
 		linear_mujer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT));
 		TextView text_hombre=new TextView(this);
 		TextView text_mujer=new TextView(this);
 		text_hombre.setText("Hombre   ");
 		text_mujer.setText("Mujer       ");
-		linear_hombre.setOrientation(LinearLayout.HORIZONTAL);
-		linear_hombre.addView(text_hombre);
-		linear_hombre.addView(hombre);
 		linear_mujer.setOrientation(LinearLayout.HORIZONTAL);
-		linear_mujer.addView(text_mujer);
+		linear_mujer.addView(hombre);
+		linear_mujer.addView(text_hombre);
 		linear_mujer.addView(mujer);
-		linear_layout.addView(linear_hombre);
+		linear_mujer.addView(text_mujer);
 		linear_layout.addView(linear_mujer);
 		
 	}

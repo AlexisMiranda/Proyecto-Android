@@ -1,12 +1,11 @@
 package com.android.gimnasio.api;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
-import android.R.integer;
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -16,42 +15,43 @@ import android.util.Log;
 public class Usuario {
 
 	private Context context;
-	public static final String nombre_tabla="usuario";
-	public static final String[] primary_key={"id_usuario","integer primary key AUTOINCREMENT"};
-	public static final String[]  nombre={"nombre","text"};
-	public static final String[]  apellido={"apellido","text"};
-	public static final String[]  edad={"edad","integer"};
-	public static final String[]  peso={"peso","real"};
-	public static final String[] estatura={"estatura","real"};
-	public static final String[]  sexo={"sexo","integer"};
-	public static final String[]  puntaje={"puntaje","integer"};
-	public static final String[]  imc={"imc","real"};
+	public static final String nombreTabla="usuario";
+	public static final String id_primaryKey_0="id";//};
+	public static final String  nombre_str_1="nombre";//,"text"};
+	//public static final String  apellido_str_2="apellido";//,"text"};
+	public static final String edad_int_3="edad";//,"integer"};
+	public static final String estatura_float_4="estatura";//,"real"};
+	public static final String sexo_int_5="sexo";//,"integer"};
+	public static final String peso_float_6="peso";//,"real"};
 
-	private static final String[][] columnas={primary_key,puntaje,edad,
-											peso,estatura,sexo,apellido,nombre,imc};
-	
+	public static final String  puntaje_float_7="puntaje";//,"integer"};
+	public static final String imc_float_8="imc";//,"real"};
+
+
+
 	public Usuario(Context context){
 		
-		this.context=context;		
+		this.context=context;
+		
 	}
-	public void crearUsuario(int id_usuario,String nombre,String apellido,int edad,float estatura,float peso,int sexo)
+	public void crearUsuario(int id_usuario,String nombre,int edad,float estatura,float peso,int sexo)
 	{
 		
 		ContentValues values=new ContentValues();
 		if(id_usuario>0)
-			values.put(Usuario.primary_key[0], id_usuario);
-		Log.d("entro a crear","CRE");
-		values.put(Usuario.nombre[0], nombre);
-		values.put(Usuario.apellido[0], apellido);
-		values.put(Usuario.edad[0], edad);
-		values.put(Usuario.estatura[0], estatura);
-		values.put(Usuario.peso[0], peso);	
-		values.put(Usuario.sexo[0], sexo);
-		values.put(Usuario.imc[0], (peso/(estatura*estatura)));
-		values.put("puntaje",0);
+			values.put(Usuario.id_primaryKey_0, id_usuario);
+		values.put(Usuario.nombre_str_1, nombre);
+		//values.put(Usuario.apellido_str_2, apellido);
+		values.put(Usuario.edad_int_3, edad);
+		values.put(Usuario.estatura_float_4, estatura);
+		values.put(Usuario.peso_float_6, peso);	
+		values.put(Usuario.sexo_int_5, sexo);
+		Float imc=peso/(estatura*estatura);
+		values.put(Usuario.imc_float_8, imc);
+		values.put(puntaje_float_7,0);
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
-		bd.insert("usuario", null, values);
+		bd.insert(Usuario.nombreTabla, null, values);
 		bd.close();
 	}
 	public boolean crearUsuario(int id_usuario,ContentValues cv_columnas)
@@ -81,72 +81,90 @@ public class Usuario {
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
-		bd.update(this.nombre_tabla, columnas, "id_usuario="+id_usuario, null);
+		bd.update(Usuario.nombreTabla, columnas, Usuario.id_primaryKey_0+"="+id_usuario, null);
 		bd.close();
 	}
 	public String getNombre(int id_usuario){
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getReadableDatabase();
-		String nombre=bd.rawQuery("select nombre from "+this.nombre_tabla+" where id_usuario="+id_usuario,null).getString(0);
-		bd.close();
-		return nombre;
-	}
-	public String getApellido(int id_usuario){
-		Log.d("Antes de la query","Entre en getApellido");
-		String apellido=getConsultaToString("select apellido from usuario where id_usuario="+id_usuario);
-		Log.d("despues de la query","Entre en getApellido");
-		return apellido;
-	}
-	public int getSexo(int id_usuario){
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getReadableDatabase();
-		String sexo=bd.rawQuery("select sexo from usuario where id_usuario="+id_usuario,null).getString(0);
-		bd.close();
-		return Integer.parseInt(sexo);
-	}
-	public int getEdad(int id_usuario){
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getReadableDatabase();
-		String edad=bd.rawQuery("select edad from usuario where id_usuario="+id_usuario,null).getString(0);
-		bd.close();
-		return Integer.parseInt(edad);
-	}
-	public float getEstatura(int id_usuario){
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getReadableDatabase();
-		String estatura=bd.rawQuery("select estatura from usuario where id_usuario="+id_usuario,null).getString(0);
-		bd.close();
-		return Float.parseFloat(estatura);
-	}
-	public float getPeso(int id_usuario){
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getReadableDatabase();
-		String peso=bd.rawQuery("select peso from usuario where id_usuario="+id_usuario,null).getString(0);
-		bd.close();
-		return Float.parseFloat(peso);
-	}
-	public int getPuntaje(int id_usuario){
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getReadableDatabase();
-		String puntaje=bd.rawQuery("select puntaje from usuario where id_usuario="+id_usuario,null).getString(0);
-		bd.close();
-		return Integer.parseInt(puntaje);
-	}
-	public float getImc(int id_usuario){
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getReadableDatabase();
-		String imc=bd.rawQuery("select imc from usuario where id_usuario="+id_usuario,null).getString(0);
-		bd.close();
-		return Float.parseFloat(imc);
+		
+		return getConsultaToString("select "+Usuario.nombre_str_1+
+								" from "+Usuario.nombreTabla+
+								" where "+Usuario.id_primaryKey_0+"="+id_usuario);
+		
 	}
 
+	public String getSexo(int id_usuario){
+
+		String sexo = getConsultaToString("select "+Usuario.sexo_int_5+
+							" from "+Usuario.nombreTabla+
+							" where "+Usuario.id_primaryKey_0+"="+id_usuario);
+		if(sexo.contains("0")){
+			return "Hombre";
+		}
+		return "Mujer";
+		
+	}
+	public String getEdad(int id_usuario){
+		
+		return getConsultaToString("select "+Usuario.edad_int_3+
+				" from "+Usuario.nombreTabla+
+				" where "+Usuario.id_primaryKey_0+"="+id_usuario);
+	}
+	public float getEstatura(int id_usuario){
+
+		return Float.parseFloat(getConsultaToString("select "+Usuario.estatura_float_4 +
+							" from "+Usuario.nombreTabla+
+							" where "+Usuario.id_primaryKey_0+"="+id_usuario));
+	}
+	public float getPeso(int id_usuario){
+
+		return Float.parseFloat(getConsultaToString("select "+Usuario.peso_float_6+
+							" from "+Usuario.nombreTabla+
+							" where "+Usuario.id_primaryKey_0+"="+id_usuario));
+	}
+	public int getPuntaje(int id_usuario){
+
+		return Integer.parseInt(getConsultaToString("select "+Usuario.puntaje_float_7+
+							" from "+Usuario.nombreTabla+
+							" where "+Usuario.id_primaryKey_0+"="+id_usuario));
+	}
+	public String getImc(int id_usuario){
+
+		return getConsultaToString("select "+Usuario.imc_float_8+
+							" from "+Usuario.nombreTabla+
+							" where "+Usuario.id_primaryKey_0+"="+id_usuario);
+	}
+
+	public HashMap<String, String> getInfoUsuario(int id_usuario)
+	{
+		HashMap<String, String> info=new HashMap<String, String>();
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		Cursor resultado=bd.rawQuery("select *"+
+									" from "+Usuario.nombreTabla+
+									" where "+Usuario.id_primaryKey_0+"="+id_usuario,null);
+		if(resultado.getCount()>0)
+		{
+			
+			while(resultado.moveToNext())
+			{
+				
+					for(int i=0;i<resultado.getColumnCount();i++)
+						{			
+						info.put(resultado.getColumnName(i),resultado.getString(i));
+						}				
+			}	
+			
+		}
+		return info;
+		
+	}
 	public ArrayList<Integer> getIdsUsuarios()
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
-		Cursor resultado=bd.rawQuery("select "+primary_key[0]+" from "+nombre_tabla,null);
+		Cursor resultado=bd.rawQuery("select "+Usuario.id_primaryKey_0+" from "+Usuario.nombreTabla,null);
 		ArrayList<Integer> ids_usuarios=new ArrayList<Integer>();
-		if (resultado.moveToFirst())
+		if (resultado.getCount()>0)
 		{
 			while(resultado.moveToNext())
 			{
@@ -157,43 +175,76 @@ public class Usuario {
 		return ids_usuarios;
 	}
 	
+	@SuppressLint("UseSparseArrays")
 	public static final HashMap<String, String> getColumnas()
 	{
-		HashMap<String, String>columnas_usuario=new HashMap<String, String>();
-		for(int i=0;i<Usuario.columnas.length;i++)
+		HashMap<String, String>columnas_tipo=new HashMap<String, String>();
+		Usuario usuario=new Usuario(null);
+		HashMap<Integer, String> columas_ordenadas=new HashMap<Integer, String>();
+		for(Field columna : usuario.getClass().getDeclaredFields())
 		{
-				columnas_usuario.put(columnas[i][0],columnas[i][1]);
-		
-		}
-		return columnas_usuario;
+			if(columna.getName().lastIndexOf("_")!=-1 )
+			{
+				int indice=columna.getName().lastIndexOf("_");
 
+					columas_ordenadas.put(Integer.parseInt(columna.getName().substring(indice+1)), columna.getName().substring(0,indice));
+					Log.d("columna = ",columna.getName());
+				
+			}
+		}
+		Log.d("Lista de llaves ",columas_ordenadas.toString());
+		List<Integer> keys = new ArrayList<Integer>(columas_ordenadas.keySet());
+		for(int i=keys.size()-1;i>=0;i--)
+		{
+			String columna=columas_ordenadas.get(keys.get(i));
+			if(columna.indexOf("_")!=-1)
+			{
+				int indice=columna.indexOf("_");
+				columnas_tipo.put(columna.substring(0,indice),getTipoDeDato(columna.substring(indice+1)));
+			}
+		}
+		Log.d("Hash map = ",columnas_tipo.toString());
+		return columnas_tipo;
+ 
 	}
+	public static final String getTipoDeDato(String tipo)
+	{
+		if(tipo.contains("int"))
+		{
+			return "integer";
+		}else if (tipo.contains("str")) {
+			return  "text";
+		}else if (tipo.contains("float")) {
+			return  "real";
+		}else if(tipo.contains("primaryKey")){
+			return "integer primary key AUTOINCREMENT";
+		}
+		return "";
+		
+	}
+
 	public boolean existeUsuario(int id_usuario)
 	{
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-		SQLiteDatabase bd = admin.getReadableDatabase();
-		Cursor resultados = bd.rawQuery("select * from "+nombre_tabla+" where "+primary_key[0]+"="+id_usuario, null);
-		if (resultados.moveToFirst()){
-			Log.d("existe "+Usuario.class,"True");
-			return true;
-		}	
-		Log.d("existe "+Usuario.class,"False");
-		return false;
+		String query=getConsultaToString("select * from usuario where "+Usuario.id_primaryKey_0+" = "+id_usuario);
+		if(query.equals(""))
+		{
+			return false;
+		}
+		return true;
 	}
 	public String getConsultaToString(String query)
 	{
-		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
 		SQLiteDatabase bd = admin.getReadableDatabase();
 		Cursor resultados = bd.rawQuery(query, null);
 		if (resultados.getCount()>0) 
 		{
 			String res="";
-			Log.d("entre en if","*****");
 			while(resultados.moveToNext())
 			{
 			for(int i=0;i<resultados.getColumnCount();i++)
 				{			
-				res+=resultados.getColumnName(i)+resultados.getString(i)+"\t";
+				res+=resultados.getString(i)+"\t";
 				}
 			res+="\n";
 			}
@@ -209,7 +260,7 @@ public class Usuario {
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
-		bd.execSQL("delete from "+nombre_tabla+" where "+primary_key[0]+"="+id_usuario);
+		bd.execSQL("delete from "+nombreTabla+" where "+Usuario.id_primaryKey_0+"="+id_usuario);
 	}
 
 }

@@ -2,7 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.gimnasio"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0" 
+    
+    >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -26,10 +28,19 @@
             android:name=".FormularioUsuarioActivity"
             android:label="FormularioUsuarioActivity"
             />
-                <activity 
-            android:name=".PrincipalActivity"
+         <activity 
+            android:name="com.android.gimnasio.SeleccionarMaquinaActivity"
             android:label="PrincipalActivity"
             />
+          <activity 
+            android:name="com.android.gimnasio.PrincipalActivity"
+            android:label="PrincipalActivity"
+            />
+          <activity 
+            android:name="com.android.gimnasio.MaquinaEjercicioActivity"
+            android:label="PrincipalActivity"
+            />
+        
     </application>
 
 </manifest>
