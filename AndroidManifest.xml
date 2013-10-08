@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.android.gimnasio.HomeActivity"
+            android:name="com.android.gimnasio.SeleccionarMaquinaActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,16 +29,24 @@
             android:label="FormularioUsuarioActivity"
             />
          <activity 
-            android:name="com.android.gimnasio.SeleccionarMaquinaActivity"
-            android:label="PrincipalActivity"
-            />
-          <activity 
             android:name="com.android.gimnasio.PrincipalActivity"
             android:label="PrincipalActivity"
             />
           <activity 
+            android:name="com.android.gimnasio.EjercicioRealizadoActivity"
+            android:label="Ejercicio Realizado"
+            />
+          <activity 
             android:name="com.android.gimnasio.MaquinaEjercicioActivity"
-            android:label="PrincipalActivity"
+            android:label="Maquina Ejercicio"
+            />
+          <activity 
+            android:name="com.android.gimnasio.SeleccionarDiaActivity"
+            android:label="Seleccionar Dia"
+            />
+          <activity 
+            android:name="com.android.gimnasio.MaquinasPorDiaActivity"
+            android:label="Maquinas por Dia"
             />
         
     </application>

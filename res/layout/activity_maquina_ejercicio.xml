@@ -61,6 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Siguiente"
-        android:textSize="6dp" />
+        android:textSize="6dp"
+        android:onClick="clickEnElBoton" />
 
 </LinearLayout>

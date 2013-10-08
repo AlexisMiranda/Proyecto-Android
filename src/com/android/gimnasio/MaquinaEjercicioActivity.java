@@ -1,9 +1,11 @@
 package com.android.gimnasio;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -35,6 +37,11 @@ public class MaquinaEjercicioActivity extends Activity {
  agregarFilasTabla();
     }
 
+    public void clickEnElBoton(View v)
+    {
+    	Intent i=new Intent(this, SeleccionarDiaActivity.class);
+    	startActivity(i);
+    }
     public void agregarCabecera(){
      TableRow fila;
      TextView txtId;
