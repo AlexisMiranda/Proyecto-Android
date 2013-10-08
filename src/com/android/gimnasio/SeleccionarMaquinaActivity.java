@@ -60,8 +60,9 @@ public class SeleccionarMaquinaActivity extends Activity{
 		titulo=new TextView(this);
 		siguiente=new Button(this);
 		siguiente.setLayoutParams(new LinearLayout.LayoutParams(
-				ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT));
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.MATCH_PARENT));
+		siguiente.setText("Seleccionar Tipo Ejercicio");
 		siguiente.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -80,6 +81,7 @@ public class SeleccionarMaquinaActivity extends Activity{
 		{
 			 LinearLayout l2=new LinearLayout(this);
 			    l2.setOrientation(LinearLayout.HORIZONTAL);
+			    l2.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 			    l2.addView(new TextView(this));
 			  
 		     for(int col=0;col<2;col++)
@@ -110,6 +112,8 @@ public class SeleccionarMaquinaActivity extends Activity{
 			 num_row+=1;
 		}
 		LinearLayout l2=new LinearLayout(this);
+	    l2.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+
 	    l2.setOrientation(LinearLayout.HORIZONTAL);
 	    l2.addView(new TextView(this));
 

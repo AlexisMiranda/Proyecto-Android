@@ -30,6 +30,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -60,7 +61,7 @@ public class FormularioUsuarioActivity extends Activity {
 		submit.setHeight(30);
 		linear_layout.setPadding(20, 0, 20, 0);
 		titulo_layout=new LinearLayout(this);
-		titulo_layout.setPadding(400, 100, 100, 100);
+		titulo_layout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		titulo=new ImageView(this);
 		titulo.setPadding(100, 0, 100,10);
 		titulo.setLayoutParams(new LinearLayout.LayoutParams(
