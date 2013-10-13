@@ -28,6 +28,8 @@ public class PrincipalActivity extends Activity {
 	private TextView text;
 	private HashMap<String,String> t_maquina_columnas;
 	private Maquina m;
+	private TipoEjercicio te;
+	private Button b;
 	//linea de ejemplo con branches
 	final static String ACT_INFO = "com.android.gimnasio.PrincipalActivity";
 	private LinearLayout linear,linear2;
@@ -36,32 +38,32 @@ public class PrincipalActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_principal);
+		Usuario u=new Usuario(this);
+		//u.crearUsuario(1, "alexis",22,(float)22.6,(float)70.3,1);
 		linear=(LinearLayout)findViewById(R.id.linear);
+		text=new TextView(this);
+		linear.addView(text);
 		m=new Maquina(this);
+		te=new TipoEjercicio(this);
 		Log.d("Entre a la acttividad","");	
-		ArrayList<Integer> ids=m.getIdsMaquinas();
-		int cnt=0;
-		for(int i=0;i<10;i++)
-		{
-			linear2=new LinearLayout(this);
-			linear2.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-			linear2.setOrientation(LinearLayout.HORIZONTAL);
+		b=new Button(this);
+		b.setText("consulta");
+		b.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
 
-			
-				Log.d("Entre a la acttividad","");
-				text=new TextView(this);
-				text.setText(ids.get(cnt));
-				linear2.addView(text);
-					cnt+=1;
-			
-			Button b=new Button(this);
-			b.setText("eded");
-			linear.addView(linear2);
-			linear.addView(b);
-		}
-		
-		Log.d("Entra acttividad","");	
-		
+				
+				String res="";
+				res=m.getConsultaToString("select * from maquina" );
+				res+="\n\n****tipos de maquinas";
+				res+="\n"+te.getConsultaToString("select * from "+TipoEjercicio.nombreTabla);
+				res+="\n"+te.getIdsTipoEjercicios(3).toString();
+
+				text.setText(res);				
+			}
+		});
+		linear.addView(b);
 		
 		/*text=(TextView)findViewById(R.id.text);
 		Usuario u=new Usuario(this);
@@ -80,6 +82,7 @@ public class PrincipalActivity extends Activity {
 
 	public void enviar(View view){
 
+		
 		//tabla maquina
 		//Usuario u=new Usuario(this);
 		
@@ -101,7 +104,11 @@ public class PrincipalActivity extends Activity {
 		
 	}
 	
-
+	@Override
+	public void onBackPressed() {
+			text.setText("dejdedendnejnde");
+	return;
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.

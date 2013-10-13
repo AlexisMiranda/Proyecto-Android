@@ -1,5 +1,7 @@
 package com.android.gimnasio.api;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +12,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 public class TipoEjercicio {
@@ -35,14 +39,15 @@ public class TipoEjercicio {
 			values.put(TipoEjercicio.fkm_maquina_4,id_maquina);
 			values.put(TipoEjercicio.descripcion_str_3, descripcion);
 			values.put(TipoEjercicio.rutaImagenes_str_1, ruta_imagenes);
-			if(id_maquina>=0)
+			if(id_maquina>0)
 				values.put(TipoEjercicio.id_primaryKey_0,id_tipo_ejercicio);
 			AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 			SQLiteDatabase bd = admin.getWritableDatabase();
 			bd.insert(TipoEjercicio.nombreTabla, null, values);
 			bd.close();
+			;
 		}
-		public static final ContentValues insertarMaquina(int id_tipo_ejercicio, int id_maquina,String nombre,String descripcion,String ruta_imagenes)
+		public static final ContentValues insertarTipoEjercicio(int id_tipo_ejercicio, int id_maquina,String nombre,String descripcion,String ruta_imagenes)
 		{
 			ContentValues values=new ContentValues();
 			values.put( TipoEjercicio.fkm_maquina_4, id_maquina);
@@ -52,6 +57,8 @@ public class TipoEjercicio {
 
 			if(id_maquina>0)
 				values.put(id_primaryKey_0,id_tipo_ejercicio);
+			Log.d("insertando tipoejercicio",values.toString());
+
 			return values;
 			
 		}
@@ -61,6 +68,7 @@ public class TipoEjercicio {
 			SQLiteDatabase bd = admin.getWritableDatabase();
 			bd.update(TipoEjercicio.nombreTabla, columnas, TipoEjercicio.id_primaryKey_0+"='"+id_tipo_ejercicio+"'", null);
 			bd.close();
+			;
 		}
 		public int getIdMaquina(int id_tipo_ejercicio)
 		{
@@ -140,7 +148,37 @@ public class TipoEjercicio {
 			return "";
 			
 		}
-		
+		public String getrutaImagen(int id_tipo_ejercicio,int id_maquina)
+		{
+			
+			String url=getConsultaToString("select "+TipoEjercicio.rutaImagenes_str_1
+									+" from "+TipoEjercicio.nombreTabla+
+									" where "+TipoEjercicio.id_primaryKey_0+" = "+id_tipo_ejercicio+
+									" and " +TipoEjercicio.fkm_maquina_4+" = "+id_maquina);
+			String url2="";
+			//url al final tiene un salto de linea por ello se parsea y se le quita el salto de linea
+			for(int i=0;i<url.length();i++)
+			{
+				if(i+1<url.length())
+				if(url.substring(i,i+1).matches("[a-z]|[A-Z]|[/]|[.]|[0-9]|[_]"))
+				{
+					url2+=url.substring(i,i+1);
+				}
+			}
+			return url2;
+		}
+		public Bitmap getImagen(int id_tipo_ejercicio,int id_maquina,Context c)
+		{
+			InputStream is = null;
+			try {
+				is = context.getResources().getAssets().open(this.getrutaImagen(id_tipo_ejercicio,id_maquina));
+				//is = c.getResources().getAssets().open(s);
+			} catch (IOException e) {
+				;
+			}
+			return  BitmapFactory.decodeStream(is);
+			
+		}
 		public String getConsultaToString(String query)
 		{
 			AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
@@ -158,33 +196,52 @@ public class TipoEjercicio {
 				res+="\n";
 				}
 				bd.close();
+				;
+				resultados.close();
 				return res;
 			}
 			bd.close();
+			;
+			resultados.close();
+
 			return "";
 				
 		}
-		public ArrayList<Integer> getIdsTipoEjercicios()
+	
+	public ArrayList<Integer> getIdsTipoEjercicios(int id_maquina)
+	{
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		Log.d("nombre maquina",""+id_maquina);
+		String query=" select "+TipoEjercicio.id_primaryKey_0+ 
+						" from "+TipoEjercicio.nombreTabla+
+						" where "+TipoEjercicio.fkm_maquina_4 +" = "+id_maquina;	
+		
+		Cursor resultado=bd.rawQuery(query,null);
+		Log.d("resultado === "+resultado.toString(),"");
+		ArrayList<Integer> ids_tipo_ejercicio=new ArrayList<Integer>();
+		if (resultado.moveToFirst())
 		{
-			AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
-			SQLiteDatabase bd = admin.getWritableDatabase();
-			Cursor resultado=bd.rawQuery("select "+TipoEjercicio.id_primaryKey_0+" from "+TipoEjercicio.nombreTabla,null);
-			Log.d("resultado === "+resultado.toString(),"");
-			ArrayList<Integer> ids_maquinas=new ArrayList<Integer>();
-			if (resultado.moveToFirst())
+			while(resultado.moveToNext())
 			{
-				while(resultado.moveToNext())
-				{
-					ids_maquinas.add(Integer.parseInt(resultado.getString(0)));
-					
-				}	
-			}
-			return ids_maquinas;
+				ids_tipo_ejercicio.add(Integer.parseInt(resultado.getString(0)));
+				
+			}	
 		}
+		bd.close();
+		;
+		resultado.close();
+
+
+		return ids_tipo_ejercicio;
+	}
+	
 		public void eliminarTipoEjercicio(int id_tipo_ejercicio)
 		{
 			AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 			SQLiteDatabase bd = admin.getWritableDatabase();
 			bd.execSQL("delete from "+TipoEjercicio.nombreTabla+" where "+id_primaryKey_0+"="+id_tipo_ejercicio);
+			bd.close();
+			;
 		}
 }

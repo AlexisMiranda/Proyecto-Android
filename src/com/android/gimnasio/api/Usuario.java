@@ -41,7 +41,6 @@ public class Usuario {
 		if(id_usuario>0)
 			values.put(Usuario.id_primaryKey_0, id_usuario);
 		values.put(Usuario.nombre_str_1, nombre);
-		//values.put(Usuario.apellido_str_2, apellido);
 		values.put(Usuario.edad_int_3, edad);
 		values.put(Usuario.estatura_float_4, estatura);
 		values.put(Usuario.peso_float_6, peso);	
@@ -53,7 +52,8 @@ public class Usuario {
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.insert(Usuario.nombreTabla, null, values);
 		bd.close();
-	}
+		;	
+		}
 	public boolean crearUsuario(int id_usuario,ContentValues cv_columnas)
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
@@ -67,6 +67,7 @@ public class Usuario {
 		}
 		bd.insert("usuario", null, cv_columnas);
 		bd.close();
+		;	
 		return true;
 	}
 
@@ -83,7 +84,8 @@ public class Usuario {
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.update(Usuario.nombreTabla, columnas, Usuario.id_primaryKey_0+"="+id_usuario, null);
 		bd.close();
-	}
+		;
+		}
 	public String getNombre(int id_usuario){
 		
 		return getConsultaToString("select "+Usuario.nombre_str_1+
@@ -155,6 +157,10 @@ public class Usuario {
 			}	
 			
 		}
+		bd.close();
+		;
+		resultado.close();
+
 		return info;
 		
 	}
@@ -172,6 +178,10 @@ public class Usuario {
 				
 			}	
 		}
+		bd.close();
+		resultado.close();
+
+		;
 		return ids_usuarios;
 	}
 	
@@ -248,10 +258,15 @@ public class Usuario {
 				}
 			res+="\n";
 			}
-			bd.close();
+			bd.close();		
+			resultados.close();
+
 			return res;
 		}
 		bd.close();
+		resultados.close();
+
+		;
 		return "";
 			
 	}
@@ -261,6 +276,8 @@ public class Usuario {
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.execSQL("delete from "+nombreTabla+" where "+Usuario.id_primaryKey_0+"="+id_usuario);
+		bd.close();
+		;
 	}
 
 }

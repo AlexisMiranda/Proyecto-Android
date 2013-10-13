@@ -42,6 +42,7 @@ public class TipoEjercicioUsuario {
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.insert(TipoEjercicioUsuario.nombreTabla, null, values);
 		bd.close();
+		;
 	}
 	
 	public int getIdEjercicio(int id_tipo_ejercicio_usuario)
@@ -148,9 +149,13 @@ public class TipoEjercicioUsuario {
 			res+="\n";
 			}
 			bd.close();
+			;
+			resultados.close();		
 			return res;
 		}
 		bd.close();
+		;
+		resultados.close();
 		return "";
 			
 	}
@@ -159,5 +164,7 @@ public class TipoEjercicioUsuario {
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.execSQL("delete from "+TipoEjercicioUsuario.nombreTabla+" where "+id_primaryKey_0+"="+id_tipo_ejercicio_usuario);
+		;
+		bd.close();
 	}
 }

@@ -3,6 +3,7 @@ package com.android.gimnasio;
 import java.util.HashMap;
 
 import com.android.gimnasio.api.AdminSQLiteOpenHelper;
+import com.android.gimnasio.api.InsertarDatos;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,6 +19,7 @@ public class HomeActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
+		InsertarDatos.setDeDatos(this, 1);
 	}
 
 	public void enviar(View view){

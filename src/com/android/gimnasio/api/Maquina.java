@@ -37,12 +37,13 @@ public class Maquina {
 		values.put(Maquina.nombre_str_1, nombre);
 		values.put(Maquina.tipoMaquina_str_2,tipo_de_maquina);
 		values.put(Maquina.rutaImagen_str_3,ruta_imagen);
-		if(id_maquina!=-1)
+		if(id_maquina>0)
 			values.put(id_primaryKey_0,id_maquina);
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.insert(Maquina.nombreTabla, null, values);
 		bd.close();
+		;
 	}
 	public static final ContentValues insertarMaquina(int id_maquina,String nombre,String tipo_de_maquina,String ruta_imagen)
 	{
@@ -52,6 +53,7 @@ public class Maquina {
 		values.put(Maquina.rutaImagen_str_3,ruta_imagen);
 		if(id_maquina>0)
 			values.put(id_primaryKey_0,id_maquina);
+		Log.d("insertando maquina",values.toString());
 		return values;
 		
 	}
@@ -62,6 +64,7 @@ public class Maquina {
 		
 		bd.update(Maquina.nombreTabla, columnas, id_primaryKey_0+"='"+id_maquina+"'", null);
 		bd.close();
+		;
 	}
 	public String getNombre(int id_maquina)
 	{
@@ -93,6 +96,9 @@ public class Maquina {
 				
 			}	
 		}
+		bd.close();
+		;
+		resultado.close();
 		return ids_maquinas;
 	}
 	
@@ -179,15 +185,22 @@ public class Maquina {
 		SQLiteDatabase bd = admin.getReadableDatabase();
 		Cursor resultados = bd.rawQuery("select * from "+Maquina.nombreTabla+
 										" where "+Maquina.id_primaryKey_0+"="+id_maquina, null);
+		bd.close();
+		;
 		if (resultados.moveToFirst()){
+			resultados.close();
+
 			return true;
 		}	
+		resultados.close();
+
 		return false;
 	}
 	public String getConsultaToString(String query)
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
+		
 		Cursor resultados = bd.rawQuery(query, null);
 		if (resultados.getCount()>0) 
 		{
@@ -201,9 +214,15 @@ public class Maquina {
 			res+="\n";
 			}
 			bd.close();
+			;
+			resultados.close();
+
 			return res;
 		}
 		bd.close();
+		;
+		resultados.close();
+
 		return "";
 			
 	}
@@ -211,7 +230,10 @@ public class Maquina {
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
-		bd.execSQL("delete from "+Maquina.nombreTabla+" where "+Maquina.id_primaryKey_0+"="+id_maquina);	
+		bd.execSQL("delete from "+Maquina.nombreTabla+" where "+Maquina.id_primaryKey_0+"="+id_maquina);
+		bd.close();
+		;
+
 	}
 
 

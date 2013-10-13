@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.android.gimnasio.R.id;
 import com.android.gimnasio.api.Maquina;
 import com.android.gimnasio.api.TipoEjercicio;
 import com.android.gimnasio.api.Usuario;
@@ -48,12 +49,13 @@ public class SeleccionarMaquinaActivity extends Activity{
 	private int num_row=0;
 	private Button siguiente;
 	public void onCreate(Bundle savedInstanceState)
-	{
+	{ 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_seleccionar_maquina);
 		l1=(LinearLayout)findViewById(R.id.linear);
 		maquina=new Maquina(this);
 		ids_maquinas=maquina.getIdsMaquinas();
+
 		titulo=new TextView(this);
 		siguiente=new Button(this);
 		siguiente.setLayoutParams(new LinearLayout.LayoutParams(
@@ -129,6 +131,7 @@ public class SeleccionarMaquinaActivity extends Activity{
 		 l1.addView(siguiente,num_row);
 		 num_row+=1;
 	}
+
 	
 	public LinearLayout crearLinearLayout()
 	{
@@ -154,10 +157,16 @@ public class SeleccionarMaquinaActivity extends Activity{
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
-			       if (buttonView.isChecked()) {
+			       if (buttonView.isChecked()) 
+			       {
+			    	   	if(isChecked){
                          Toast.makeText(getBaseContext(),  "checkeado "+buttonView.getId(),Toast.LENGTH_SHORT).show();
                          ids_maquinas_seleccionadas.add(buttonView.getId());   
-			       }						
+			    	   	}else{
+			    	   		Toast.makeText(getBaseContext(),  "Descheckeado "+buttonView.getId(),Toast.LENGTH_SHORT).show();
+	                         ids_maquinas_seleccionadas.remove(buttonView.getId()); 
+			    	   	}
+			    	  }						
 			}
           });
 	return checkBox;	
