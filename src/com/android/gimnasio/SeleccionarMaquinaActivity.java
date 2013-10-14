@@ -153,22 +153,21 @@ public class SeleccionarMaquinaActivity extends Activity{
 	LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, heigth);
 	lp.setMargins(20, 0, 0, 0);
 	checkBox.setLayoutParams(lp);
-	checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-			       if (buttonView.isChecked()) 
-			       {
-			    	   	if(isChecked){
-                         Toast.makeText(getBaseContext(),  "checkeado "+buttonView.getId(),Toast.LENGTH_SHORT).show();
-                         ids_maquinas_seleccionadas.add(buttonView.getId());   
-			    	   	}else{
-			    	   		Toast.makeText(getBaseContext(),  "Descheckeado "+buttonView.getId(),Toast.LENGTH_SHORT).show();
-	                         ids_maquinas_seleccionadas.remove(buttonView.getId()); 
-			    	   	}
-			    	  }						
-			}
-          });
+	checkBox.setOnClickListener(new View.OnClickListener() {
+	      @Override
+	      public void onClick(View v) {
+	                //is chkIos checked?
+	        if (((CheckBox) v).isChecked()) {
+	        	 Toast.makeText(getBaseContext(),  "checkeado "+v.getId(),Toast.LENGTH_SHORT).show();
+                 ids_maquinas_seleccionadas.add(v.getId());  
+	        }else {
+	        	Toast.makeText(getBaseContext(),  "Descheckeado "+v.getId(),Toast.LENGTH_SHORT).show();
+                ids_maquinas_seleccionadas.remove((Object)v.getId()); 
+	        }
+
+	      }
+	    });
+	
 	return checkBox;	
 	}
 	public ImageView crearImageView(int indice_maquina)

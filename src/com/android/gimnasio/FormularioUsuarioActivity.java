@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,10 +65,11 @@ public class FormularioUsuarioActivity extends Activity {
 		titulo_layout=new LinearLayout(this);
 		titulo_layout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		titulo=new ImageView(this);
-		titulo.setPadding(100, 0, 100,10);
-		titulo.setLayoutParams(new LinearLayout.LayoutParams(
-				ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT));
+		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, getResources().getDisplayMetrics());
+		int heigth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, getResources().getDisplayMetrics());
+		LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(width,heigth);
+		lp.setMargins(40, 20,0,20);
+		titulo.setLayoutParams(lp);
 		titulo.setImageResource(R.drawable.titulo_tu_informacion);
 		linear_layout.addView(titulo);
 		usuario=new Usuario(this);
