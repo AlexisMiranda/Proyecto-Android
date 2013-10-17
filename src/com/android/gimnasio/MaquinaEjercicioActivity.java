@@ -2,9 +2,13 @@ package com.android.gimnasio;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
+import com.android.gimnasio.api.InsertarDatos;
 import com.android.gimnasio.api.Maquina;
+import com.android.gimnasio.api.RequerimientoEjercicio;
 import com.android.gimnasio.api.TipoEjercicio;
+import com.android.gimnasio.api.TipoEjercicioUsuario;
 
 import android.R.color;
 import android.annotation.SuppressLint;
@@ -35,23 +39,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
+@SuppressLint("UseSparseArrays")
 public class MaquinaEjercicioActivity extends Activity {
 
  
 	private int indice_maqui_selec=1;
 	private ScrollView scroll;
-	private ArrayList<Integer> ids_maquinas_seleccionadas;
-	private Maquina maquina;
-	private TipoEjercicio tipo_ejercicio;
+	private ArrayList<Integer> ids_maquinas_seleccionadas,ids_ejercicios_seleccionados;
+	private Maquina tabla_maquina;
+	private TipoEjercicio tabla_tipo_ejercicio;
+	private TipoEjercicioUsuario tabla_tipoEjercicio_usuario;
+	private RequerimientoEjercicio tabla_requerimiento_ejercicio;
 	private ArrayList<ScrollView> Layout_contenedor;
-	HashMap<Integer, ArrayList<Integer>> dias_por_ejercicio;
+
+	private static String[] param_edit_text={"Peso","Repeticiones","Series"};
+	private static String[] dias={"Lun","Mar","Mie","Jue","Vie","Sab","Dom"};
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        maquina=new Maquina(this);
-        tipo_ejercicio=new TipoEjercicio(this);
+        tabla_maquina=new Maquina(this);
+        tabla_tipo_ejercicio=new TipoEjercicio(this);
+        tabla_tipoEjercicio_usuario=new TipoEjercicioUsuario(this);
+        tabla_requerimiento_ejercicio=new RequerimientoEjercicio(this);
         Layout_contenedor=new ArrayList<ScrollView>();
-        dias_por_ejercicio=new HashMap<Integer, ArrayList<Integer>>();
+        //ids_ejercicios_seleccionados=new ArrayList<Integer>();
         ids_maquinas_seleccionadas=getIntent().getIntegerArrayListExtra("ids_maquinas_seleccionadas");
         /*ids_maquinas_seleccionadas=new ArrayList<Integer>();
         ids_maquinas_seleccionadas.add(2);
@@ -94,10 +106,11 @@ public class MaquinaEjercicioActivity extends Activity {
 		Log.d("clic","entre en clic");
 		if(indice_maqui_selec<ids_maquinas_seleccionadas.size())
 		{
-			if(validarCampos((LinearLayout)((LinearLayout)scroll.getChildAt(0)).getChildAt(2)))
+			if(validarCampos(ids_maquinas_seleccionadas.get(indice_maqui_selec)))
 			{
 			Layout_contenedor.add(scroll);
-			scroll.removeAllViews();
+			ids_ejercicios_seleccionados.clear();//borra todos los elementos del array que contiene los ejercicios seleccionados
+			scroll.removeAllViews();//borra todos los hijos de scroll
 			scroll.addView(crearContenedor2(ids_maquinas_seleccionadas.get(indice_maqui_selec)));
 			Log.d("pase scroll","pase scroll");
 			setContentView(scroll);
@@ -115,8 +128,8 @@ public class MaquinaEjercicioActivity extends Activity {
 	{
 		LinearLayout l1=new LinearLayout(this);
 		l1.setOrientation(LinearLayout.VERTICAL);
-		l1.addView(crearTitulo(R.drawable.titulo_seleccion_de_maquinas,200,80,100,10,100,0));
-		l1.addView(crearImageView(maquina.getImagen(id_maquina, this),200,200,70,0,0,10));
+		l1.addView(crearTitulo(R.drawable.titulo_seleccion_de_maquinas,150,80,50,10,50,0));
+		l1.addView(crearImageView(tabla_maquina.getImagen(id_maquina, this),200,200,40,0,40,5));
 		Log.d("pase crear image con margen","imagen con margenes");
 		l1.addView(crearLayout(id_maquina));
 		l1.addView(crearBoton());
@@ -144,7 +157,7 @@ public class MaquinaEjercicioActivity extends Activity {
 	public LinearLayout crearLayout(int id_maquina)
 	{
 		Log.d("Entre en crear linearlayout","id maquina="+id_maquina);
-	    ArrayList<Integer> ids_tipo_ejercicios=tipo_ejercicio.getIdsTipoEjercicios(id_maquina);
+	    ArrayList<Integer> ids_tipo_ejercicios=tabla_tipo_ejercicio.getIdsTipoEjercicios(id_maquina);
 		Log.d("ids tipos de ejercicios",ids_tipo_ejercicios.toString());
 
 		int num_filas=ids_tipo_ejercicios.size(),indice_imagen=0,indice_checkbox=0;
@@ -156,27 +169,27 @@ public class MaquinaEjercicioActivity extends Activity {
 		for(int fila=0;fila<num_filas;fila++)
 		{
 			LinearLayout linear_horizontal=new LinearLayout(this);
-			linear_horizontal.setOrientation(LinearLayout.HORIZONTAL);
+			linear_horizontal.setOrientation(LinearLayout.VERTICAL);
 			linear_horizontal.setId(ids_tipo_ejercicios.get(indice_imagen));
 			linear_horizontal.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.MATCH_PARENT));
 			for(int col=0;col<2;col++)
 			{
 				switch (col) {
-				case 0://imagen del ejercicio
-					Bitmap imagen=tipo_ejercicio.getImagen(ids_tipo_ejercicios.get(indice_imagen), id_maquina, this);
-						ImageView img=crearImageView(imagen,150,200,20,0,0,20);
-						img.setId(ids_tipo_ejercicios.get(indice_imagen));
-						
-						linear_horizontal.addView(img);
-						indice_imagen+=1;
-					break;
-				case 1://checkbox que indica si se quiere realizar o no algun ejercicio
-						//si lo selecciona se despliegan las opciones del ejercicio.
-					String texto=tipo_ejercicio.getNombre(ids_tipo_ejercicios.get(indice_checkbox));
-					int id_ejercicio=ids_tipo_ejercicios.get(indice_checkbox);
-					linear_horizontal.addView(crearCheckbox(id_ejercicio,texto, 100, 50, false, 5, 100, 0, 0));
-					indice_checkbox+=1;
-					break;
+					case 0:	//checkbox que indica si se quiere realizar o no algun ejercicio
+							//si lo selecciona se despliegan las opciones del ejercicio.
+							String texto=tabla_tipo_ejercicio.getNombre(ids_tipo_ejercicios.get(indice_checkbox));
+							int id_ejercicio=ids_tipo_ejercicios.get(indice_checkbox);
+							linear_horizontal.addView(crearCheckbox(id_ejercicio,texto, 250, 50, false, 4, 1, 0, 0));
+							indice_checkbox+=1;
+							break;
+					case 1:		//imagen del ejercicio
+							Bitmap imagen=tabla_tipo_ejercicio.getImagen(ids_tipo_ejercicios.get(indice_imagen), id_maquina, this);
+							ImageView img=crearImageView(imagen,300,150,1,1,1,5);
+							img.setId(ids_tipo_ejercicios.get(indice_imagen));
+							linear_horizontal.addView(img);
+							indice_imagen+=1;
+							break;
+				
 				}
 			}
 			linear_vertical.addView(linear_horizontal);
@@ -215,8 +228,9 @@ public class MaquinaEjercicioActivity extends Activity {
 		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, w, getResources().getDisplayMetrics());
 		int heigth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, h, getResources().getDisplayMetrics());
 		CheckBox c=new CheckBox(this);
-		c.setText(texto);
-		c.setTextSize(10);
+		String texto_parseado=texto.toLowerCase();
+		c.setText(texto_parseado.substring(0, 1).toUpperCase()+texto_parseado.substring(1));
+		c.setTextSize(15);
 		c.setTextColor(Color.GRAY);
 		c.setChecked(checked);
 		Log.d("checbox","checkbox");
@@ -230,14 +244,15 @@ public class MaquinaEjercicioActivity extends Activity {
 		        if (((CheckBox) v).isChecked())
 		        {
 		        	 Toast.makeText(getBaseContext(),  "checkeado "+v.getId(),Toast.LENGTH_SHORT).show();
-	                 
 	                	 LinearLayout l=(LinearLayout) v.getParent().getParent();
+	                	 
 	            			for(int i=0;i<l.getChildCount();i++)
 	            			{
 	            				if(l.getChildAt(i).getId()==v.getId())
 	            				{
 	                			Log.d("crear tabla de datos",""+v.getId());
-	                			 l.addView(crearTablaDatos(v.getId(),400, 200, 15, 5, 0, 5), i+1);
+	                			ids_ejercicios_seleccionados.add(v.getId());//selecciona el ejercicio
+	                			 l.addView(crearTablaDatos(v.getId(), 5, 0, 2, 1), i+1);
 	        	                 break;
 	            				}
 	            			}          	 
@@ -249,7 +264,9 @@ public class MaquinaEjercicioActivity extends Activity {
 		        		{
 		        			if(l.getChildAt(i).getId()==v.getId())
 		        			{
-		        				l.removeViewAt(i+1);	                 
+		        				l.removeViewAt(i+1);
+				        		ids_ejercicios_seleccionados.remove((Object)v.getId());
+
 		        			}
 		        		}
 		       	 
@@ -262,114 +279,87 @@ public class MaquinaEjercicioActivity extends Activity {
 		c.setLayoutParams(lp);
 		return c;
 	}
-	public TableLayout crearTablaDatos(int id_ejercicio,int w,int h,int left,int top,int right,int bottom)
+	public LinearLayout crearTablaDatos(int id_ejercicio,int left,int top,int right,int bottom)
 	{
-		TableLayout tabla = new TableLayout(this);
-		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, w, getResources().getDisplayMetrics());
-		int heigth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, h, getResources().getDisplayMetrics());
-		TableLayout.LayoutParams tableParams = new TableLayout.LayoutParams(width,heigth);
-		tableParams.setMargins(left, top, right, bottom);
-		int width2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 44, getResources().getDisplayMetrics());
-		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(width2, TableRow.LayoutParams.WRAP_CONTENT);
+		LinearLayout tabla = new LinearLayout(this);
+		tabla.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams tableParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+		tableParams.setMargins(left, top, right, bottom);		
 		//se le asigna el id_ejercicio multiplicado por 10,ya que este id ya esta ocupado por otro objeto checkbox
 		tabla.setId(id_ejercicio*10);
 		Log.d("id tabla",""+tabla.getId());
-
-		//tabla.setId(id_ejercicio);
-		String[] texto={"Peso","Repeticiones","Series"};
-		String[] dias={"Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"};
+		tabla.setLayoutParams(tableParams);
 		for(int i=0;i<4;i++)
 		{
-			TableRow tableRow = new TableRow(this);
-			tableRow.setLayoutParams(tableParams);
+			LinearLayout tableRow = new LinearLayout(this);
+			tableRow.setOrientation(LinearLayout.HORIZONTAL);
+			LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+			tableRow.setLayoutParams(lp);
 			 
 			switch (i) {
-			case 0://textview que contiene el texto de repeticiones,peso,series
-				int cnt=0;
-				for(int j=0;j<5;j++)
-				{
-					if(j%2==0){
-						TextView tv=crearTexto(texto[cnt],20,10,0,0,0,0);
-						tv.setLayoutParams(rowParams);
-						tableRow.addView(tv);
-						cnt+=1;
-					}else{
-						TextView tv=crearTexto("",20,10,0,0,0,0);
-						tv.setLayoutParams(rowParams);
-						tableRow.addView(tv);
-					}
-				}
-				break;
+					case 0://textview que contiene el texto de repeticiones,peso,series
+							for(int j=0;j<3;j++)
+							{
+									TextView tv=crearTexto(param_edit_text[j],100,20,1,0,0,0);
+									tableRow.addView(tv);
+							}
+							break;
 
-			case 1://Edit text donde se ingresara el peso,repeticiones y series
-				int cnt2=0;
-				for(int j=0;j<5;j++)
-				{
-					if(j%2==0)
-					{
-						EditText et=crearEditText(cnt2);
-						et.setLayoutParams(rowParams);
-						tableRow.addView(et);
-						cnt2+=1;
-					}else{
-						TextView tv=crearTexto("",20,10,0,0,0,0);
-						tv.setLayoutParams(rowParams);
-						tableRow.addView(tv);
-					} 
-				}
+					case 1://Edit text donde se ingresara el peso,repeticiones y series
+							for(int j=0;j<3;j++)
+							{
+									EditText et=crearEditText(id_ejercicio,param_edit_text[j], 100,40,1,0,0,0);
+									tableRow.addView(et);
+							}
+							
+							break;
+					case 2://7 textview que contiene los dias de la semana lunes-domingo
+							for(int j=0;j<7;j++)
+							{
+								TextView et=crearTexto(dias[j], 40, 20, 3, 5, 0, 0);
+								tableRow.addView(et);
+							}
+							
+							break;
+					case 3://7 edittext que contiene los dias de la semana lunes-domingo
+							for(int j=0;j<7;j++)
+							{
+								CheckBox et=crearCheckboxDias(id_ejercicio,dias[j], 40, 40, false, 3, 5, 0, 0);
+								tableRow.addView(et);
+							}
 				
-				break;
-			case 2://7 textview que contiene los dias de la semana lunes-domingo
-				for(int j=0;j<7;j++)
-				{
-					TextView et=crearTexto(dias[j], 10, 5, 1, 5, 0, 5);
-					et.setLayoutParams(rowParams);
-					tableRow.addView(et);
+							break;
 				}
-				
-				break;
-			case 3://7 edittext que contiene los dias de la semana lunes-domingo
-				for(int j=0;j<7;j++)
-				{
-					CheckBox et=crearCheckboxDias(j, "", 5, 5, false, 1, 5, 0, 5);
-					et.setLayoutParams(rowParams);
-					tableRow.addView(et);
-				}
-				
-				break;
-			}
 		tabla.addView(tableRow);	
 		}
 
 		return tabla;
 	}
 	/*Checkbox que representan los dias de la semana del lunes a domingo*/
-	@SuppressLint("ShowToast")
 	public CheckBox crearCheckboxDias(int id_ejercicio,String texto,int w,int h,boolean checked,int left,int top,int right,int bottom)
 	{
 		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, w, getResources().getDisplayMetrics());
 		int heigth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, h, getResources().getDisplayMetrics());
 		CheckBox c=new CheckBox(this);
-		c.setText(texto);
+		//c.setText(texto);
 		c.setTextSize(10);
 		c.setTextColor(Color.GRAY);
 		c.setChecked(checked);
-		Log.d("checbox","checkbox");
-		c.setId(id_ejercicio);
+		c.setTag(texto+id_ejercicio);
 		c.setOnClickListener(new View.OnClickListener()
 		{
 		      @Override
 		      public void onClick(View v) 
 		      {
 		    	if(((CheckBox)v).isChecked()){
-		    		TableLayout t=(TableLayout)v.getParent().getParent();
+		    		LinearLayout t=(LinearLayout)v.getParent().getParent();
 		    		int id_ejercicio=t.getId()/10;
-		    		Toast.makeText(getApplicationContext(), "Dia seleccionado = "+v.getId()+" en maquina "+tipo_ejercicio.getNombre(id_ejercicio), Toast.LENGTH_LONG).show();
-		    		
+		    		String mensaje= "Dia seleccionado = "+(v.getTag()+"").replaceAll("[0-9]","")+" en maquina "+tabla_tipo_ejercicio.getNombre(id_ejercicio);
+		    		Toast.makeText(getApplicationContext(),mensaje, Toast.LENGTH_LONG).show();
 		    	} else{
-		    		TableLayout t=(TableLayout)v.getParent().getParent();
+		    		LinearLayout t=(LinearLayout)v.getParent().getParent();
 		    		int id_ejercicio=t.getId()/10;
-		    		Toast.makeText(getApplicationContext(), "Dia deseleccionado = "+v.getId()+" en maquina "+tipo_ejercicio.getNombre(id_ejercicio), Toast.LENGTH_LONG).show();
+		    		Toast.makeText(getApplicationContext(), "Dia deseleccionado = "+v.getId()+" en maquina "+tabla_tipo_ejercicio.getNombre(id_ejercicio), Toast.LENGTH_LONG).show();
 		    
 		    	} 
 		      }
@@ -388,62 +378,101 @@ public class MaquinaEjercicioActivity extends Activity {
 		lp.setMargins(left, top, right, bottom);
 		text.setLayoutParams(lp);
 		text.setText(texto);
-		text.setTextSize(7);
+		text.setTextSize(15);
 		text.setTextColor(Color.GRAY);
 		return text;
 	}
-	public boolean validarCampos(LinearLayout nieto_de_scroll)
+	public boolean validarCampos(int id_maquina)
 	{
-		String[] texto={"Peso","Repeticiones","Series"};
-		//HashMap<Integer, ArrayList<Integer>> 
-		
-		for(int i=0;i<nieto_de_scroll.getChildCount();i++)//saco los hijos del linearlayout
+		/*
+		 * -Valida que el usuario seleccione un ejercicio por lo menos
+		 * -Valida que el o los ejercicios seleccionados no posean los campos(parametros) edit text vacios
+		 * -Valida que seleccione por lo menos un dia en el checkbox por maquina seleccionada
+		 */
+		HashMap<Integer, ArrayList<String>> dias_selec_por_ejer=new HashMap<Integer, ArrayList<String>>();
+		HashMap<Integer, ArrayList<String>> param_ingre_por_ejer=new HashMap<Integer, ArrayList<String>>();
+		if(ids_ejercicios_seleccionados.size()==0)//valida que un ejercicio este seleccionado
 		{
-			View hijo =nieto_de_scroll.getChildAt(i);
-			Log.d("Hijo ",hijo.toString());
-			if(hijo.toString().contains("TableLayout"))//saco los tablelayouts
+			Toast.makeText(this,"Seleccione por lo menos un ejercicio",Toast.LENGTH_SHORT).show();
+			return false;
+		}else{
+			for(int id_ejercicio:ids_ejercicios_seleccionados)//por cada ejercicio seleccionado
 			{
-				TableLayout t=(TableLayout)hijo;
-				for(int ind_row=0;ind_row<t.getChildCount();ind_row++)//recorro los tablerow del tablelayots
-				{
-					TableRow row=(TableRow)t.getChildAt(ind_row);
-					for(int ind_hijo_row=0;ind_hijo_row<row.getChildCount();ind_hijo_row++)
-					{
-						View hijo_row=row.getChildAt(ind_hijo_row);
-						Log.d("Hijo row =",hijo_row.toString());
-						if(hijo_row.toString().contains("Edit"))//si es un edittext valido que no este vacio
-						{
-							
-							EditText edit_text=(EditText)hijo_row;
-							Log.d("Entre en edit text ="+edit_text.getText().toString(),"Entre en edit text = "+edit_text.getText().toString().equals(""));
-							if(edit_text.getText().toString().equals(""))//que no este vacio
-							{
-								String alerta="Ingresa un valor en "+texto[edit_text.getId()]+" en la maquina"+tipo_ejercicio.getNombre((t.getId()/10));
-								Log.d("Esta vacio",alerta);
-								Toast.makeText(this,alerta, Toast.LENGTH_LONG).show();
-								return false;
-							}
-						}else if (hijo_row.toString().contains("Check")) 
-							{//si es un checkbox
-								Log.d("Entre checkbox ="+hijo_row.toString(),"Entre en edit text = checkbox");
-
-							}
+				ArrayList<String> param_ingresados=new ArrayList<String>();
+				//busco los textos segun los ejercicios
+					for(String param:param_edit_text){
+						//saco los parametros edit text
+						EditText parm_edit_text=(EditText)scroll.findViewWithTag(param+id_ejercicio);
+						if(parm_edit_text.getText().toString().length()==0){
+							String alerta="Ingresa un valor en "+param+" en el ejercicio "+tabla_tipo_ejercicio.getNombre(id_ejercicio);
+							Toast.makeText(this,alerta,Toast.LENGTH_SHORT).show();
+							return false;
+						}
+						param_ingresados.add(parm_edit_text.getText().toString());
 					}
-				}
+					ArrayList<String> dias_selecionados=new ArrayList<String>();
+				//busco los checkbox dias seleccionados 
+					for(String dia:dias)
+					{
+						//saco los parametros edit text
+						CheckBox dia_check_box=(CheckBox)scroll.findViewWithTag(dia+id_ejercicio);
+						if(dia_check_box.isChecked())
+						{
+							dias_selecionados.add(dia);
+						}	
+					}
+					//valido que por lo menos un checbox dia este seleccionado
+					if(dias_selecionados.size()==0)
+						{
+						String alerta="Selecciona por lo menos un dia en el ejercicio "+tabla_tipo_ejercicio.getNombre(id_ejercicio);
+						Toast.makeText(this,alerta,Toast.LENGTH_SHORT).show();
+						return false;
+						}
+					dias_selec_por_ejer.put(id_ejercicio, dias_selecionados);
+					param_ingre_por_ejer.put(id_ejercicio, param_ingresados);
 			}
+	
 		}
+		this.insertarDatosEnBd(dias_selec_por_ejer, param_ingre_por_ejer, id_maquina);
 		return true;
 		
 	}
 
-	public EditText crearEditText(int id)
+	public void insertarDatosEnBd(HashMap<Integer, ArrayList<String>>dias_selec_por_ejer,HashMap<Integer, ArrayList<String>> param_ingre_por_ejer, int id_maquina)
 	{
-		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics());
-		int heigth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, getResources().getDisplayMetrics());
+		//Por cada ejercicio seleccionado inserto los parametros del ejercicio como peso,repeticiones y
+		//los dias seleccionados para realizar esos ejercicios
+		Log.d("insertarDatosEnBd","param = "+dias_selec_por_ejer.toString()+param_ingre_por_ejer.toString()+"id_maquina "+id_maquina);
+		Iterator<Integer> ejercicios= dias_selec_por_ejer.keySet().iterator();
+		while(ejercicios.hasNext())
+		{
+			int id_ejercicio=ejercicios.next();
+			for(String dia:dias_selec_por_ejer.get(id_ejercicio))
+			{
+				tabla_tipoEjercicio_usuario.crearTipoEjercicioUsuario(0, id_ejercicio, 1,dia);
+				ArrayList<String> array_param=param_ingre_por_ejer.get(id_ejercicio);
+				int id_tipo_ejercicio_usuario=tabla_tipoEjercicio_usuario.getUltimoIdInsertado();
+				for(int ind=0;ind<array_param.size();ind++)
+				{					
+					tabla_requerimiento_ejercicio.crearRequerimiento(0, id_tipo_ejercicio_usuario,param_edit_text[ind], array_param.get(ind));
+				}
+			}
+		}
+		Log.d("tabla tipo_ejercicio_usuario",tabla_tipoEjercicio_usuario.getConsultaToString("select * from "+TipoEjercicioUsuario.nombreTabla));
+		Log.d("tabla requerimientos ",tabla_requerimiento_ejercicio.getConsultaToString("select * from "+RequerimientoEjercicio.nombreTabla));
+
+	}
+
+	public EditText crearEditText(int id,String texto,int w,int h,int left,int top,int right,int bottom)
+	{
+		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, w, getResources().getDisplayMetrics());
+		int heigth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, h, getResources().getDisplayMetrics());
+		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, heigth);
+		lp.setMargins(left, top, right, bottom);
 		EditText edit=new EditText(this);
-		edit.setLayoutParams(new LinearLayout.LayoutParams(width,heigth));
+		edit.setLayoutParams(lp);
 		edit.setInputType(InputType.TYPE_CLASS_NUMBER);
-		edit.setId(id);
+		edit.setTag(texto+id);
 		edit.setFilters(new InputFilter[] {new InputFilter.LengthFilter(5)});
 		return edit;
 	}

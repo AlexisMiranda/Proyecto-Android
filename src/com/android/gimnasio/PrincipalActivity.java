@@ -33,12 +33,16 @@ public class PrincipalActivity extends Activity {
 	//linea de ejemplo con branches
 	final static String ACT_INFO = "com.android.gimnasio.PrincipalActivity";
 	private LinearLayout linear,linear2;
-
+	private RequerimientoEjercicio tabla_requerimiento_ejercicio;
+	private TipoEjercicioUsuario tabla_tipoEjercicio_usuario;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_principal);
 		Usuario u=new Usuario(this);
+		tabla_requerimiento_ejercicio=new RequerimientoEjercicio(this);
+		tabla_tipoEjercicio_usuario=new TipoEjercicioUsuario(this);
 		//u.crearUsuario(1, "alexis",22,(float)22.6,(float)70.3,1);
 		linear=(LinearLayout)findViewById(R.id.linear);
 		text=new TextView(this);
@@ -55,10 +59,12 @@ public class PrincipalActivity extends Activity {
 
 				
 				String res="";
-				res=m.getConsultaToString("select * from maquina" );
-				res+="\n\n****tipos de maquinas";
+				res=tabla_tipoEjercicio_usuario.getConsultaToString("select * from "+TipoEjercicioUsuario.nombreTabla);
+				res+="\n **\n"+tabla_requerimiento_ejercicio.getConsultaToString("select * from "+RequerimientoEjercicio.nombreTabla);
+				//m.getConsultaToString("select * from maquina" );
+				/*res+="\n\n****tipos de maquinas";
 				res+="\n"+te.getConsultaToString("select * from "+TipoEjercicio.nombreTabla);
-				res+="\n"+te.getIdsTipoEjercicios(3).toString();
+				res+="\n"+te.getIdsTipoEjercicios(3).toString();*/
 
 				text.setText(res);				
 			}

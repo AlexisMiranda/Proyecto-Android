@@ -24,15 +24,15 @@ public class InsertarDatos {
 		//maquina 2
 		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(1,2, "prueba", "prueba", "prueba.jpg"));
 		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(2,2, "Polea al pecho", "Polea al pecho", "ejercicios/multifuncional/poleaAlPecho.png"));
-		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(3,2, "remoPoleaBaja", "remoPoleaBaja", "ejercicios/multifuncional/remoPoleaBaja.png"));
-		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(4,2, "extensionesDePiernas", "extensionesDePiernas", "ejercicios/multifuncional/extensionesDePiernas.png"));
-		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(5,2, "triceptsPuchDown", "triceptsPuchDown", "ejercicios/multifuncional/triceptsPuchDown.png"));
-		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(6,2, "extensionesDeTricepts", "extensionesDeTricepts", "ejercicios/multifuncional/extensionesDeTricepts.png"));
+		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(3,2, "Remo Polea Baja", "remoPoleaBaja", "ejercicios/multifuncional/remoPoleaBaja.png"));
+		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(4,2, "Extensiones De Piernas", "extensionesDePiernas", "ejercicios/multifuncional/extensionesDePiernas.png"));
+		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(5,2, "Tricepts PuchDown", "triceptsPuchDown", "ejercicios/multifuncional/triceptsPuchDown.png"));
+		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(6,2, "Extensiones De Tricepts", "extensionesDeTricepts", "ejercicios/multifuncional/extensionesDeTricepts.png"));
 		                                                                               
 		//maquina 3                                                                    
 		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(7,3, "prueba", "prueba", "prueba.jpg"));
 		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(8,3, "Polea al pecho", "Polea al pecho", "ejercicios/multifuncional/poleaAlPecho.png"));
-		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(9,3, "remoPoleaBaja", "remoPoleaBaja", "ejercicios/multifuncional/remoPoleaBaja.png"));
+		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(9,3, "Remo Polea Baja", "remoPoleaBaja", "ejercicios/multifuncional/remoPoleaBaja.png"));
 		//maquina 4                                                                    
 
 		db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(10,4, "prueba", "prueba", "prueba.jpg"));

@@ -31,7 +31,7 @@ public class RequerimientoEjercicio {
 		values.put(RequerimientoEjercicio.nombre_str_1, nombre);
 		values.put(RequerimientoEjercicio.fkteu_tipoEjercicioUsuario_3,id_tipo_ejercicio_usuario);
 		values.put(RequerimientoEjercicio.valor_str_2, valor);
-		if(id_requerimiento_ejercicio>=0)
+		if(id_requerimiento_ejercicio>0)
 			values.put(RequerimientoEjercicio.id_primaryKey_0,id_requerimiento_ejercicio);
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();

@@ -17,27 +17,22 @@ public class TipoEjercicioUsuario {
 	private Context context;
 	public static final String nombreTabla="tipoEjercicioUsuario";
 	public static final String id_primaryKey_0="id";
-	public static final String  repeticiones_int_1="repeticiones";
-	public static final String  series_int_2="series";
-	public static final String  dia_str_2="dia";
-	public static final String  fkte_tipoEjercicio_4="fkte";
-	public static final String  fku_usuario_5="fku";
+	public static final String  fkte_tipoEjercicio_1="fkte";
+	public static final String  fku_usuario_2="fku";
+	public static final String dia_str_3="dia";
 	
 	public TipoEjercicioUsuario(Context context)
 	{
 	this.context=context;	
 	}
-	public void crearTipoEjercicioUsuario(int id_tipo_ejercicio_usuario,int id_tipo_ejercicio,int id_usuario,int repeticiones,int series,int dia)
+	public void crearTipoEjercicioUsuario(int id_tipo_ejercicio_usuario,int id_tipo_ejercicio,int id_usuario,String dia)
 	{
 		ContentValues values=new ContentValues();
-		values.put(TipoEjercicioUsuario.fkte_tipoEjercicio_4, id_tipo_ejercicio);
-		values.put(TipoEjercicioUsuario.fku_usuario_5,id_usuario);
-		values.put(TipoEjercicioUsuario.repeticiones_int_1, repeticiones_int_1);
-		values.put(TipoEjercicioUsuario.series_int_2, series);
-		values.put(TipoEjercicioUsuario.dia_str_2, dia);
-		if(id_tipo_ejercicio_usuario>=0)
+		values.put(TipoEjercicioUsuario.fkte_tipoEjercicio_1, id_tipo_ejercicio);
+		values.put(TipoEjercicioUsuario.fku_usuario_2,id_usuario);
+		values.put(TipoEjercicioUsuario.dia_str_3,dia);
+		if(id_tipo_ejercicio_usuario>0)
 			values.put(TipoEjercicioUsuario.id_primaryKey_0,id_tipo_ejercicio_usuario);
-		
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.insert(TipoEjercicioUsuario.nombreTabla, null, values);
@@ -47,33 +42,39 @@ public class TipoEjercicioUsuario {
 	
 	public int getIdEjercicio(int id_tipo_ejercicio_usuario)
 	{
-		return Integer.parseInt(getConsultaToString("select "+TipoEjercicioUsuario.fkte_tipoEjercicio_4+
+		return Integer.parseInt(getConsultaToString("select "+TipoEjercicioUsuario.fkte_tipoEjercicio_1+
 				" from "+TipoEjercicioUsuario.nombreTabla+
 				" "+"where "+TipoEjercicioUsuario.id_primaryKey_0+"="+id_tipo_ejercicio_usuario));
 	}
 	public int getIdUsuario(int id_tipo_ejercicio_usuario)
 	{
-		return Integer.parseInt(getConsultaToString("select "+TipoEjercicioUsuario.fku_usuario_5+
-				" from "+TipoEjercicioUsuario.nombreTabla+
-				" "+"where "+TipoEjercicioUsuario.id_primaryKey_0+"="+id_tipo_ejercicio_usuario));
-	}
-	public int getRepeticiones(int id_tipo_ejercicio_usuario)
-	{
-		return Integer.parseInt(getConsultaToString("select "+TipoEjercicioUsuario.repeticiones_int_1+
-				" from "+TipoEjercicioUsuario.nombreTabla+
-				" "+"where "+TipoEjercicioUsuario.id_primaryKey_0+"="+id_tipo_ejercicio_usuario));
-	}
-	public int getSeries(int id_tipo_ejercicio_usuario)
-	{
-		return Integer.parseInt(getConsultaToString("select "+TipoEjercicioUsuario.series_int_2+
+		return Integer.parseInt(getConsultaToString("select "+TipoEjercicioUsuario.fku_usuario_2+
 				" from "+TipoEjercicioUsuario.nombreTabla+
 				" "+"where "+TipoEjercicioUsuario.id_primaryKey_0+"="+id_tipo_ejercicio_usuario));
 	}
 	public String getDia(int id_tipo_ejercicio_usuario)
 	{
-		return getConsultaToString("select "+TipoEjercicioUsuario.dia_str_2+
+		return getConsultaToString("select "+TipoEjercicioUsuario.dia_str_3+
 				" from "+TipoEjercicioUsuario.nombreTabla+
 				" "+"where "+TipoEjercicioUsuario.id_primaryKey_0+"="+id_tipo_ejercicio_usuario);
+	}
+	public int getUltimoIdInsertado()
+	{
+		Log.d(TipoEjercicioUsuario.nombreTabla,"open getUltimoIdInsertado");
+		String res=getConsultaToString("select "+id_primaryKey_0+
+									" from "+TipoEjercicioUsuario.nombreTabla+
+									" order by "+id_primaryKey_0+" desc limit 1");
+		Log.d(TipoEjercicioUsuario.nombreTabla,"open getUltimoIdInsertado= *"+res+"*");
+		String res2="";
+		for(int i=0;i<res.length();i++)
+		{
+			if(i+1<res.length())
+			if(res.substring(i,i+1).matches("[0-9]"))
+			{
+				res2+=res.substring(i,i+1);
+			}
+		}
+		return Integer.parseInt(res2);
 	}
 	public static final HashMap<String, String> getColumnas()
 	{
