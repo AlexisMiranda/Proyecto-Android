@@ -37,7 +37,7 @@ public class TipoEjercicioUsuario {
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.insert(TipoEjercicioUsuario.nombreTabla, null, values);
 		bd.close();
-		;
+		
 	}
 	
 	public int getIdEjercicio(int id_tipo_ejercicio_usuario)
@@ -75,6 +75,29 @@ public class TipoEjercicioUsuario {
 			}
 		}
 		return Integer.parseInt(res2);
+	}
+	public ArrayList<Integer> getIdsTypeEjerUserByTypeEjer(int id_tipo_ejercicio)
+	{
+		Log.d(""+TipoEjercicioUsuario.nombreTabla,"ArrayList<Integer> getIdsTypeEjerUserByTypeEjer(int id_tipo_ejercicio)");
+		ArrayList<Integer> ids=new ArrayList<Integer>();
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		Cursor resultado=bd.rawQuery(" select "+TipoEjercicioUsuario.id_primaryKey_0+
+									" from "+TipoEjercicioUsuario.nombreTabla+
+									" where "+TipoEjercicioUsuario.fkte_tipoEjercicio_1+" = "+id_tipo_ejercicio,null);
+		Log.d("resultado === "+resultado.toString(),"");
+		if (resultado.getCount()>0)
+		{
+			while(resultado.moveToNext())
+			{
+				ids.add(Integer.parseInt(resultado.getString(0)));
+				
+			}	
+		}
+		bd.close();
+		resultado.close();
+		return ids;
+		
 	}
 	public static final HashMap<String, String> getColumnas()
 	{
@@ -150,12 +173,10 @@ public class TipoEjercicioUsuario {
 			res+="\n";
 			}
 			bd.close();
-			;
 			resultados.close();		
 			return res;
 		}
 		bd.close();
-		;
 		resultados.close();
 		return "";
 			
@@ -165,7 +186,16 @@ public class TipoEjercicioUsuario {
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.execSQL("delete from "+TipoEjercicioUsuario.nombreTabla+" where "+id_primaryKey_0+"="+id_tipo_ejercicio_usuario);
-		;
+		
+		bd.close();
+	}
+	public void eliminarTipoEjerUsuarioPorTipoEjer(int id_tipoEjercicio)
+	{
+		Log.d(TipoEjercicioUsuario.nombreTabla,"eliminarTipoEjerUsuarioPorTipoEjer(int id_tipoEjercicio)");
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		bd.execSQL("delete from "+TipoEjercicioUsuario.nombreTabla+
+					" where "+TipoEjercicioUsuario.fkte_tipoEjercicio_1+" = "+id_tipoEjercicio);
 		bd.close();
 	}
 }

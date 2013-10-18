@@ -55,7 +55,7 @@ public class TipoEjercicio {
 			values.put(TipoEjercicio.nombre_str_2,nombre);
 			values.put(TipoEjercicio.rutaImagenes_str_1,ruta_imagenes);
 
-			if(id_maquina>0)
+			if(id_tipo_ejercicio>0)
 				values.put(id_primaryKey_0,id_tipo_ejercicio);
 			Log.d("insertando tipoejercicio",values.toString());
 
@@ -220,7 +220,7 @@ public class TipoEjercicio {
 		Cursor resultado=bd.rawQuery(query,null);
 		Log.d("resultado === "+resultado.toString(),"");
 		ArrayList<Integer> ids_tipo_ejercicio=new ArrayList<Integer>();
-		if (resultado.moveToFirst())
+		if (resultado.getCount()>0)
 		{
 			while(resultado.moveToNext())
 			{

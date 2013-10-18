@@ -88,7 +88,7 @@ public class Maquina {
 		Cursor resultado=bd.rawQuery("select "+Maquina.id_primaryKey_0+" from "+Maquina.nombreTabla,null);
 		Log.d("resultado === "+resultado.toString(),"");
 		ArrayList<Integer> ids_maquinas=new ArrayList<Integer>();
-		if (resultado.moveToFirst())
+		if (resultado.getCount()>0)
 		{
 			while(resultado.moveToNext())
 			{
@@ -187,7 +187,7 @@ public class Maquina {
 										" where "+Maquina.id_primaryKey_0+"="+id_maquina, null);
 		bd.close();
 		;
-		if (resultados.moveToFirst()){
+		if (resultados.getCount()>0){
 			resultados.close();
 
 			return true;

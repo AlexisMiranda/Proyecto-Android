@@ -139,9 +139,11 @@ public class RequerimientoEjercicio {
 			res+="\n";
 			}
 			bd.close();
+			resultados.close();
 			return res;
 		}
 		bd.close();
+		resultados.close();
 		return "";
 			
 	}
@@ -149,7 +151,17 @@ public class RequerimientoEjercicio {
 	{
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
-		bd.execSQL("delete from "+RequerimientoEjercicio.nombreTabla+" where "+id_primaryKey_0+"="+id_requerimiento_ejercicio);
+		bd.execSQL("delete from "+RequerimientoEjercicio.nombreTabla+
+				" where "+RequerimientoEjercicio.id_primaryKey_0+"="+id_requerimiento_ejercicio);
+	}
+	public void eliminarReqEjerPorTipoEjerUser(int id_tipo_ejercicio_usuario)
+	{
+		Log.d(RequerimientoEjercicio.nombreTabla,"eliminarReqEjerPorTipoEjerUser(int id_tipo_ejercicio_usuario)");
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		bd.execSQL("delete from "+RequerimientoEjercicio.nombreTabla+
+					" where "+RequerimientoEjercicio.fkteu_tipoEjercicioUsuario_3+" = "+id_tipo_ejercicio_usuario);
+		bd.close();
 	}
 	
 }

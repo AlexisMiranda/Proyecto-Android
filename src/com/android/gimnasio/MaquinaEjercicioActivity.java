@@ -43,7 +43,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 public class MaquinaEjercicioActivity extends Activity {
 
  
-	private int indice_maqui_selec=1;
+	private int indice_maqui_selec=0;
 	private ScrollView scroll;
 	private ArrayList<Integer> ids_maquinas_seleccionadas,ids_ejercicios_seleccionados;
 	private Maquina tabla_maquina;
@@ -63,7 +63,7 @@ public class MaquinaEjercicioActivity extends Activity {
         tabla_tipoEjercicio_usuario=new TipoEjercicioUsuario(this);
         tabla_requerimiento_ejercicio=new RequerimientoEjercicio(this);
         Layout_contenedor=new ArrayList<ScrollView>();
-        //ids_ejercicios_seleccionados=new ArrayList<Integer>();
+        ids_ejercicios_seleccionados=new ArrayList<Integer>();
         ids_maquinas_seleccionadas=getIntent().getIntegerArrayListExtra("ids_maquinas_seleccionadas");
         /*ids_maquinas_seleccionadas=new ArrayList<Integer>();
         ids_maquinas_seleccionadas.add(2);
@@ -80,12 +80,8 @@ public class MaquinaEjercicioActivity extends Activity {
 	}
 
 	public void onBackPressed() {
-		if(indice_maqui_selec==1)
-		{
-			indice_maqui_selec-=1;
-		}else{
-			indice_maqui_selec-=2;
-		}
+		indice_maqui_selec-=1;
+		
 		if(indice_maqui_selec>=0)
 		{
 
@@ -355,11 +351,14 @@ public class MaquinaEjercicioActivity extends Activity {
 		    		LinearLayout t=(LinearLayout)v.getParent().getParent();
 		    		int id_ejercicio=t.getId()/10;
 		    		String mensaje= "Dia seleccionado = "+(v.getTag()+"").replaceAll("[0-9]","")+" en maquina "+tabla_tipo_ejercicio.getNombre(id_ejercicio);
-		    		Toast.makeText(getApplicationContext(),mensaje, Toast.LENGTH_LONG).show();
+		    		Log.d("mensaj = ",mensaje);
+		    		//Toast.makeText(getApplicationContext(),mensaje, Toast.LENGTH_LONG).show();
 		    	} else{
 		    		LinearLayout t=(LinearLayout)v.getParent().getParent();
 		    		int id_ejercicio=t.getId()/10;
-		    		Toast.makeText(getApplicationContext(), "Dia deseleccionado = "+v.getId()+" en maquina "+tabla_tipo_ejercicio.getNombre(id_ejercicio), Toast.LENGTH_LONG).show();
+		    		String mensaje="Dia deseleccionado = "+(v.getTag()+"").replaceAll("[0-9]","")+" en maquina "+tabla_tipo_ejercicio.getNombre(id_ejercicio);
+		    		Log.d("mensaj = ",mensaje);
+		    		//Toast.makeText(getApplicationContext(), "Dia deseleccionado = "+(v.getTag()+"").replaceAll("[0-9]","")+" en maquina "+tabla_tipo_ejercicio.getNombre(id_ejercicio), Toast.LENGTH_LONG).show();
 		    
 		    	} 
 		      }
