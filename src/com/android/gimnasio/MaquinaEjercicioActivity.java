@@ -41,7 +41,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 public class MaquinaEjercicioActivity extends Activity {
 
  
-	private int indice_maqui_selec=0;
+	private int indice_maqui_selec;
 	private ScrollView scroll;
 	private ArrayList<Integer> ids_maquinas_seleccionadas,ids_ejercicios_seleccionados;
 	private Maquina tabla_maquina;
@@ -50,7 +50,7 @@ public class MaquinaEjercicioActivity extends Activity {
 	private RequerimientoEjercicio tabla_requerimiento_ejercicio;
 	private ArrayList<ScrollView> Layout_contenedor;
 	private HashMap<Integer, ArrayList<Integer>> ejercicios_seleccionados_por_maquina;
-
+	public boolean entro_en_on_create=false;
 	private static String[] param_edit_text={"Peso","Repeticiones","Series"};
 	private static String[] dias={"Lun","Mar","Mie","Jue","Vie","Sab","Dom"};
 	
@@ -65,12 +65,8 @@ public class MaquinaEjercicioActivity extends Activity {
         Layout_contenedor=new ArrayList<ScrollView>();
         ids_ejercicios_seleccionados=new ArrayList<Integer>();
         ids_maquinas_seleccionadas=getIntent().getIntegerArrayListExtra("ids_maquinas_seleccionadas");
-        /*ids_maquinas_seleccionadas=new ArrayList<Integer>();
-        ids_maquinas_seleccionadas.add(2);
-        ids_maquinas_seleccionadas.add(3);
-        ids_maquinas_seleccionadas.add(4);
-        ids_maquinas_seleccionadas.add(5);
-        */
+        entro_en_on_create=true;
+        indice_maqui_selec=0;
         scroll=new ScrollView(this);
         scroll.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		scroll.addView(crearContenedor2(ids_maquinas_seleccionadas.get(indice_maqui_selec)));
@@ -101,32 +97,49 @@ public class MaquinaEjercicioActivity extends Activity {
 		}
 		return;
 	}
+	
+	public void onResume()
+	{
+		super.onResume();
+
+		
+
+	}
+	public void onPause()
+	{
+		super.onPause();
+		indice_maqui_selec-=1;
+		if(indice_maqui_selec>=0)
+		{
+			scroll=new ScrollView(this);
+		    scroll.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+		    scroll.addView(crearContenedor2(ids_maquinas_seleccionadas.get(indice_maqui_selec)));
+			setContentView(scroll);
+		}
+		
+	}
 	public void clickEnBoton()
 	{
 		Log.d("clic","entre en clic");
-		indice_maqui_selec+=1;
-		if(indice_maqui_selec<ids_maquinas_seleccionadas.size())
+		if(validarCampos(ids_maquinas_seleccionadas.get(indice_maqui_selec)))
 		{
-			if(validarCampos(ids_maquinas_seleccionadas.get(indice_maqui_selec)))
-			{
-				
-				
+			indice_maqui_selec+=1;
+			if(indice_maqui_selec<ids_maquinas_seleccionadas.size())
+			{				
+
 				//ingreo la maquina y los ejercicios realizados por maquina
-				Log.d("entre en validar y paso a la otra maquina scroll maquina= id"+ids_maquinas_seleccionadas.get(indice_maqui_selec),"ejercicios realizados "+ids_ejercicios_seleccionados.toString());
 				this.ejercicios_seleccionados_por_maquina.put(ids_maquinas_seleccionadas.get(indice_maqui_selec-1),new ArrayList<Integer>(ids_ejercicios_seleccionados));
-				Log.d("inserto en hasmap de maquinas por ejercicio",this.ejercicios_seleccionados_por_maquina.toString());
 				ids_ejercicios_seleccionados.clear();//borra todos los elementos del array que contiene los ejercicios seleccionados
 				scroll.removeAllViews();//borra todos los hijos de scroll
 				scroll.addView(crearContenedor2(ids_maquinas_seleccionadas.get(indice_maqui_selec)));
-				Log.d("pase scroll","pase scroll");
 				setContentView(scroll);
 				
-			}
-				
-		}else{
+			}else{
 					Intent i=new Intent(getApplicationContext(),SeleccionarDiaActivity.class);
+					i.putExtra("ultima_maquina_seleccionada",""+ids_maquinas_seleccionadas.get((indice_maqui_selec-1)));
 					startActivity(i);
 			}
+		}
 			
 		
 	}
@@ -136,7 +149,6 @@ public class MaquinaEjercicioActivity extends Activity {
 		l1.setOrientation(LinearLayout.VERTICAL);
 		l1.addView(crearTitulo(R.drawable.titulo_seleccion_de_maquinas,150,80,50,10,50,0));
 		l1.addView(crearImageView(tabla_maquina.getImagen(id_maquina, this),200,200,40,0,40,5));
-		Log.d("pase crear image con margen","imagen con margenes");
 		l1.addView(crearLayout(id_maquina));
 		l1.addView(crearBoton());
 		return l1;
@@ -147,7 +159,7 @@ public class MaquinaEjercicioActivity extends Activity {
 	{
 		Button b=new Button(this);
 		b.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-		b.setText("SiguienteMaquina");
+		b.setText("Siguiente Maquina");
 		b.setOnClickListener(new View.OnClickListener() {	
 			@Override
 			public void onClick(View v) {
@@ -162,9 +174,7 @@ public class MaquinaEjercicioActivity extends Activity {
 	 * que sean seleccionados*/
 	public LinearLayout crearLayout(int id_maquina)
 	{
-		Log.d("Entre en crear linearlayout","id maquina="+id_maquina);
 	    ArrayList<Integer> ids_tipo_ejercicios=tabla_tipo_ejercicio.getIdsTipoEjercicios(id_maquina);
-		Log.d("ids tipos de ejercicios",ids_tipo_ejercicios.toString());
 
 		int num_filas=ids_tipo_ejercicios.size(),indice_imagen=0,indice_checkbox=0;
 		LinearLayout linear_vertical=new LinearLayout(this);
@@ -239,8 +249,6 @@ public class MaquinaEjercicioActivity extends Activity {
 		c.setTextSize(15);
 		c.setTextColor(Color.GRAY);
 		c.setChecked(checked);
-		Log.d("checbox","checkbox");
-
 		c.setId(id_ejercicio);
 		c.setOnClickListener(new View.OnClickListener()
 		{
@@ -249,14 +257,13 @@ public class MaquinaEjercicioActivity extends Activity {
 		      {
 		        if (((CheckBox) v).isChecked())
 		        {
-		        	 Toast.makeText(getBaseContext(),  "checkeado "+v.getId(),Toast.LENGTH_SHORT).show();
+		        	 //Toast.makeText(getBaseContext(),  "checkeado "+v.getId(),Toast.LENGTH_SHORT).show();
 	                	 LinearLayout l=(LinearLayout) v.getParent().getParent();
 	                	 
 	            			for(int i=0;i<l.getChildCount();i++)
 	            			{
 	            				if(l.getChildAt(i).getId()==v.getId())
 	            				{
-	                			Log.d("crear tabla de datos",""+v.getId());
 	                			ids_ejercicios_seleccionados.add(v.getId());//selecciona el ejercicio
 	                			 l.addView(crearTablaDatos(v.getId(), 5, 0, 2, 1), i+1);
 	        	                 break;
@@ -264,7 +271,7 @@ public class MaquinaEjercicioActivity extends Activity {
 	            			}          	 
 	                 
 		        }else {
-		        		Toast.makeText(getBaseContext(),  "Descheckeado "+v.getId(),Toast.LENGTH_SHORT).show();
+		        		//Toast.makeText(getBaseContext(),  "Descheckeado "+v.getId(),Toast.LENGTH_SHORT).show();
 		        		LinearLayout l=(LinearLayout) v.getParent().getParent();
 		        		for(int i=0;i<l.getChildCount();i++)
 		        		{
@@ -293,9 +300,7 @@ public class MaquinaEjercicioActivity extends Activity {
 		LinearLayout.LayoutParams tableParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
 		tableParams.setMargins(left, top, right, bottom);		
 		//se le asigna el id_ejercicio multiplicado por 10,ya que este id ya esta ocupado por otro objeto checkbox
-		Log.d("seteo el id","seteo");
 		tabla.setId(id_ejercicio*10);
-		Log.d("id tabla",""+tabla.getId());
 		tabla.setLayoutParams(tableParams);
 		for(int i=0;i<4;i++)
 		{
@@ -363,11 +368,11 @@ public class MaquinaEjercicioActivity extends Activity {
 		    		LinearLayout t=(LinearLayout)v.getParent().getParent();
 		    		int id_ejercicio=t.getId()/10;
 		    		String mensaje= "Dia seleccionado = "+(v.getTag()+"").replaceAll("[0-9]","")+" en maquina "+tabla_tipo_ejercicio.getNombre(id_ejercicio);
-		    		Toast.makeText(getApplicationContext(),mensaje, Toast.LENGTH_LONG).show();
+		    		//Toast.makeText(getApplicationContext(),mensaje, Toast.LENGTH_LONG).show();
 		    	} else{
 		    		LinearLayout t=(LinearLayout)v.getParent().getParent();
 		    		int id_ejercicio=t.getId()/10;
-		    		Toast.makeText(getApplicationContext(), "Dia deseleccionado = "+v.getId()+" en maquina "+tabla_tipo_ejercicio.getNombre(id_ejercicio), Toast.LENGTH_LONG).show();
+		    		//Toast.makeText(getApplicationContext(), "Dia deseleccionado = "+v.getId()+" en maquina "+tabla_tipo_ejercicio.getNombre(id_ejercicio), Toast.LENGTH_LONG).show();
 		    
 		    	} 
 		      }
@@ -397,8 +402,10 @@ public class MaquinaEjercicioActivity extends Activity {
 		 * -Valida que el o los ejercicios seleccionados no posean los campos(parametros) edit text vacios
 		 * -Valida que seleccione por lo menos un dia en el checkbox por maquina seleccionada
 		 */
+
 		HashMap<Integer, ArrayList<String>> dias_selec_por_ejer=new HashMap<Integer, ArrayList<String>>();
 		HashMap<Integer, ArrayList<String>> param_ingre_por_ejer=new HashMap<Integer, ArrayList<String>>();
+		Log.d("validar maquina ","id maquina "+id_maquina);
 		if(ids_ejercicios_seleccionados.size()==0)//valida que un ejercicio este seleccionado
 		{
 			Toast.makeText(this,"Seleccione por lo menos un ejercicio",Toast.LENGTH_SHORT).show();
@@ -452,7 +459,6 @@ public class MaquinaEjercicioActivity extends Activity {
 			los dias seleccionados para realizar esos ejercicios
 		*/
 		
-		Log.d("insertarDatosEnBd","param = "+dias_selec_por_ejer.toString()+param_ingre_por_ejer.toString()+"id_maquina "+id_maquina);
 		Iterator<Integer> ejercicios= dias_selec_por_ejer.keySet().iterator();
 		while(ejercicios.hasNext())
 		{
@@ -484,24 +490,15 @@ public void eliminarDatosEnBd(int id_maquina)
 
  */
 	Log.d(this.getClass().toString(),"eliminarDatosEnBd(int id_maquina)");
-	Log.d("maquina = "+id_maquina,"(int id_maquina)");
 	ArrayList<Integer> ids_tipo_ejercicios=this.ejercicios_seleccionados_por_maquina.get(id_maquina);
-	/*Log.d("ejercicio seleccionados por maquina = ",this.ejercicios_seleccionados_por_maquina.toString());
-	Log.d("array ids tipos ejercicios***","pase**");
-	Log.d("array ids tipos ejercicios",ids_tipo_ejercicios.toString());*/
 	for(int id_tipo_ejer:ids_tipo_ejercicios)
 	{
-		Log.d("tipo_ejercicio = =>",id_tipo_ejer+"");
-
 		ArrayList<Integer> ids_tipo_ejercicio_usuario=tabla_tipoEjercicio_usuario.getIdsTypeEjerUserByTypeEjer(id_tipo_ejer);
-		Log.d("eliminarDatosEnB","ids ids_tipo_ejercicios_usuario.llamada a la api "+ids_tipo_ejercicio_usuario.toString());
 		for(int id_tipo_ejer_user:ids_tipo_ejercicio_usuario)
 		{
 			tabla_requerimiento_ejercicio.eliminarReqEjerPorTipoEjerUser(id_tipo_ejer_user);
-			Log.d("eliminando = ","id tipo ejercicio = "+id_tipo_ejer_user);
 		}
 		tabla_tipoEjercicio_usuario.eliminarTipoEjerUsuarioPorTipoEjer(id_tipo_ejer);
-		Log.d("eliminando = ","id tipo ejercicio usuario = "+id_tipo_ejer);
 	}
 }
 	public EditText crearEditText(int id,String texto,int w,int h,int left,int top,int right,int bottom)

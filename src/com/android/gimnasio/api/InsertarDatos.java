@@ -11,15 +11,15 @@ public class InsertarDatos {
 		AdminSQLiteOpenHelper admin=new AdminSQLiteOpenHelper(context, null, version);
 		SQLiteDatabase db =admin.getWritableDatabase();
 		//db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(1,"prueba","prueba","prueba"));
-		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(2,"multifuncional","multifuncional","maquinas/multifuncional.jpg"));
-		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(3,"press banca","banca","maquinas/press_banca.jpg"));
-		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(4,"mancuernas","pesas","maquinas/mancuernas.jpg"));
-		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(5,"banco plano","banca","maquinas/banco_plano.jpg"));
-		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(6,"maquina abdominales","banca","maquinas/maquina_abdominales.jpg"));
-		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(7,"maquina piernas","pesas","maquinas/maquina_piernas.gif"));
-		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(8,"barra","barra","maquinas/barra.jpg"));
-		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(9,"trotadora","Trotadora","maquinas/trotadora.jpg"));
-		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(10,"bicicleta","spinnig","maquinas/bicicleta_spinning.jpg"));
+		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(2,"multifuncional","multifuncional","maquinas/multifuncional.jpg",0));
+		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(3,"press banca","banca","maquinas/press_banca.jpg",0));
+		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(4,"mancuernas","pesas","maquinas/mancuernas.jpg",0));
+		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(5,"banco plano","banca","maquinas/banco_plano.jpg",0));
+		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(6,"maquina abdominales","banca","maquinas/maquina_abdominales.jpg",0));
+		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(7,"maquina piernas","pesas","maquinas/maquina_piernas.gif",0));
+		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(8,"barra","barra","maquinas/barra.jpg",0));
+		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(9,"trotadora","Trotadora","maquinas/trotadora.jpg",0));
+		db.insert(Maquina.nombreTabla, null, Maquina.insertarMaquina(10,"bicicleta","spinnig","maquinas/bicicleta_spinning.jpg",0));
 		
 		//maquina 2
 		//db.insert(TipoEjercicio.nombreTabla, null, TipoEjercicio.insertarTipoEjercicio(1,2, "prueba", "prueba", "prueba.jpg"));

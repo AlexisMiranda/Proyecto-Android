@@ -37,8 +37,8 @@
             
             />
          <activity 
-            android:name="com.android.gimnasio.SeleccionarMaquinaActivity"
-            android:label="SeleccionarMaquinaActivity"
+            android:name="com.android.gimnasio.maquinasPorDia.MaquinasPorDiaActivity"
+            android:label="MaquinasPorDiaActivity"
             android:screenOrientation="portrait"
             
             />
@@ -54,8 +54,8 @@
             android:screenOrientation="portrait"
             />
          <activity 
-            android:name="com.android.gimnasio.MaquinasPorDiaActivity"
-            android:label="MaquinasPorDiaActivity"
+            android:name="com.android.gimnasio.SeleccionarMaquinaActivity"
+            android:label="SeleccionarMaquinaActivity"
             android:screenOrientation="portrait"
             />
                 <activity 

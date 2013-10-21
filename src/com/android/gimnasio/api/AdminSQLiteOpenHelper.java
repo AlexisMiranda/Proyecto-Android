@@ -29,7 +29,7 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
 	{
 		Log.d("Create uSUARIO","");
 		db.execSQL(this.getCreateTable(Usuario.nombreTabla, Usuario.getColumnas()));
-		Log.d("Create maquina","");
+		Log.d("Create maquina",""+ Maquina.getColumnas());
 		db.execSQL(this.getCreateTable(Maquina.nombreTabla, Maquina.getColumnas()));
 		Log.d("Create tipoejercicio","");
 		

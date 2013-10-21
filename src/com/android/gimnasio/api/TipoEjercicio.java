@@ -68,12 +68,32 @@ public class TipoEjercicio {
 			SQLiteDatabase bd = admin.getWritableDatabase();
 			bd.update(TipoEjercicio.nombreTabla, columnas, TipoEjercicio.id_primaryKey_0+"='"+id_tipo_ejercicio+"'", null);
 			bd.close();
-			;
+			
 		}
 		public int getIdMaquina(int id_tipo_ejercicio)
 		{
-			return Integer.parseInt(getConsultaToString("select "+TipoEjercicio.fkm_maquina_4+" from "+TipoEjercicio.nombreTabla+
-										" "+"where "+TipoEjercicio.id_primaryKey_0+"="+id_tipo_ejercicio));	
+			AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+			SQLiteDatabase bd = admin.getWritableDatabase();
+			Cursor resultado=bd.rawQuery(" select "+TipoEjercicio.fkm_maquina_4+
+														" from "+TipoEjercicio.nombreTabla+
+														" where "+TipoEjercicio.id_primaryKey_0+" = "+id_tipo_ejercicio,null);
+			String res="";
+			Log.d("pase cursor","query");
+			if(resultado.getCount()>0)
+			{
+				Log.d("query mayor que 0","query");
+				while(resultado.moveToNext())
+				{
+					res=resultado.getString(0);
+				}
+				resultado.close();
+				bd.close();
+				return Integer.parseInt(res);
+			}
+			resultado.close();
+			bd.close();
+			return -1;
+			
 		}
 
 		public String getNombre(int id_tipo_ejercicio)
@@ -181,10 +201,11 @@ public class TipoEjercicio {
 		}
 		public String getConsultaToString(String query)
 		{
-			AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+			AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
 			SQLiteDatabase bd = admin.getWritableDatabase();
+			
 			Cursor resultados = bd.rawQuery(query, null);
-			if (resultados.getCount()>0)  
+			if (resultados.getCount()>0) 
 			{
 				String res="";
 				while(resultados.moveToNext())
@@ -198,10 +219,11 @@ public class TipoEjercicio {
 				bd.close();
 				;
 				resultados.close();
+
 				return res;
 			}
 			bd.close();
-			;
+			
 			resultados.close();
 
 			return "";

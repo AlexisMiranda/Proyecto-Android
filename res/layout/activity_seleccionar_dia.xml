@@ -3,13 +3,11 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:id="@+id/tasks_list_row"
+    android:id="@+id/linar_layout_act"
     
     >
-    <CheckBox android:id="@+id/checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+
     <TextView android:id="@android:id/text1"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="100dp" />
 </LinearLayout>

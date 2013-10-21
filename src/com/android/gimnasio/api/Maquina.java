@@ -26,17 +26,21 @@ public class Maquina {
 	public static final String  nombre_str_1="nombre";
 	public static final String  tipoMaquina_str_2="tipoMaquina";
 	public static final String  rutaImagen_str_3="rutaImagen";
+	public static final String  seleccionado_int_4="seleccionado";//indica si una maquina es seleccionada por el usuario
+
 	
 	public Maquina(Context context) {
 			Maquina.context=context;
 
 	}
 
-	public void crearMaquina(int id_maquina,String nombre,String tipo_de_maquina,String ruta_imagen){
+	public void crearMaquina(int id_maquina,String nombre,String tipo_de_maquina,String ruta_imagen,int seleccionada){
 		ContentValues values=new ContentValues();
 		values.put(Maquina.nombre_str_1, nombre);
 		values.put(Maquina.tipoMaquina_str_2,tipo_de_maquina);
 		values.put(Maquina.rutaImagen_str_3,ruta_imagen);
+		values.put(Maquina.seleccionado_int_4,seleccionada);
+
 		if(id_maquina>0)
 			values.put(id_primaryKey_0,id_maquina);
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
@@ -45,12 +49,14 @@ public class Maquina {
 		bd.close();
 		;
 	}
-	public static final ContentValues insertarMaquina(int id_maquina,String nombre,String tipo_de_maquina,String ruta_imagen)
+	public static final ContentValues insertarMaquina(int id_maquina,String nombre,String tipo_de_maquina,String ruta_imagen,int seleccionada)
 	{
 		ContentValues values=new ContentValues();
 		values.put( Maquina.nombre_str_1, nombre);
 		values.put(Maquina.tipoMaquina_str_2,tipo_de_maquina);
 		values.put(Maquina.rutaImagen_str_3,ruta_imagen);
+		values.put(Maquina.seleccionado_int_4,seleccionada);
+
 		if(id_maquina>0)
 			values.put(id_primaryKey_0,id_maquina);
 		Log.d("insertando maquina",values.toString());
@@ -97,11 +103,67 @@ public class Maquina {
 			}	
 		}
 		bd.close();
-		;
 		resultado.close();
 		return ids_maquinas;
 	}
-	
+	public ArrayList<Integer> getMaquinasSeleccionadas()
+	{
+		/*
+		 * Devuelve el id de las maquinas que han sido seleccionadas por el usuari
+		 */
+		ArrayList<Integer> ids=new ArrayList<Integer>();
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		Cursor resultado=bd.rawQuery("select "+Maquina.id_primaryKey_0+
+									" from "+Maquina.nombreTabla+
+									" where "+Maquina.seleccionado_int_4+" = 1",null);
+		if(resultado.getCount()>0)
+		{
+			while(resultado.moveToNext())
+			{
+				ids.add(Integer.parseInt(resultado.getString(0)));
+			}
+		}else{
+			bd.close();
+			resultado.close();
+			return new ArrayList<Integer>();
+		}
+		bd.close();
+		resultado.close();
+		return ids;
+	}
+	/*
+	 * Recibe como parametro un dia Lunes,Martes
+	 */
+	public ArrayList<Integer> getMaquinasSeleccionadasPorDia(String dia)
+	{
+		/*
+		 * En la base de datos los dias se guardan como lun,mar..
+		 */
+		Log.d("entre en getMaquinasSeleccionadasPorDia",dia);
+		TipoEjercicioUsuario  teu=new TipoEjercicioUsuario(context);
+		TipoEjercicio te=new TipoEjercicio(context);
+		Log.d("todos los ejercicios",te.getConsultaToString(" select * from "+TipoEjercicio.nombreTabla));
+		dia=dia.substring(0, 3);
+		Log.d("dia seleccionado",dia);
+		ArrayList<Integer> ids_maquinas=new ArrayList<Integer>();
+		ArrayList<Integer> ids_ejercicios= ids_ejercicios=teu.getIdEjercicioPorDia(dia);
+        Log.d("todos los ejercicios",ids_ejercicios.toString());
+        for(int id_ejer:ids_ejercicios)
+        {
+        	Log.d("id_ejer",""+id_ejer);
+        	if(!ids_maquinas.contains(id_ejer)) // si no contine a esa maquina la agrega
+        	{
+        		Log.d("entro en get ids maquina","id maquina");
+        		int id_maquina=te.getIdMaquina(id_ejer);
+        		Log.d("id_maquina",""+id_maquina);
+
+        	ids_maquinas.add(id_maquina);
+        	}
+        }
+        Log.d("salgo de getMaquinasSeleccionadasPorDia",ids_maquinas.toString());
+		return ids_maquinas;
+	}
 	@SuppressLint("UseSparseArrays")
 	public static final HashMap<String, String> getColumnas()
 	{
@@ -220,7 +282,7 @@ public class Maquina {
 			return res;
 		}
 		bd.close();
-		;
+		
 		resultados.close();
 
 		return "";

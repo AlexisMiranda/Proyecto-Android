@@ -58,6 +58,32 @@ public class TipoEjercicioUsuario {
 				" from "+TipoEjercicioUsuario.nombreTabla+
 				" "+"where "+TipoEjercicioUsuario.id_primaryKey_0+"="+id_tipo_ejercicio_usuario);
 	}
+	public ArrayList<Integer> getIdEjercicioPorDia(String dia)
+	{
+		ArrayList<Integer> ids=new ArrayList<Integer>();
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		Log.d("entre en getIdEjercicioPorDia","dia= "+dia);
+		Cursor resultado=bd.rawQuery(" select "+TipoEjercicioUsuario.fkte_tipoEjercicio_1+
+									" from "+TipoEjercicioUsuario.nombreTabla+
+									" where "+TipoEjercicioUsuario.dia_str_3+" ='"+dia+"'",null);
+		Log.d("res","cursor");
+		if(resultado.getCount()>0)
+		{
+			while(resultado.moveToNext())
+			{
+				Log.d("resultado=",resultado.getString(0));
+				ids.add(Integer.parseInt(resultado.getString(0)));
+			}
+		}else{
+			bd.close();
+			resultado.close();
+			return new ArrayList<Integer>();
+		}
+		bd.close();
+		resultado.close();
+		return ids;
+	}
 	public int getUltimoIdInsertado()
 	{
 		Log.d(TipoEjercicioUsuario.nombreTabla,"open getUltimoIdInsertado");
@@ -98,6 +124,47 @@ public class TipoEjercicioUsuario {
 		resultado.close();
 		return ids;
 		
+	}
+	public ArrayList<String> getDiasInsertados()
+	{
+		/*
+		 * Obtiene los dias que existen en la base de datos
+		 */
+		Log.d("entre en ","getDiasInsertados");
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		Cursor resultados = bd.rawQuery(" select "+TipoEjercicioUsuario.dia_str_3+
+										" from "+TipoEjercicioUsuario.nombreTabla+
+										" group by "+TipoEjercicioUsuario.dia_str_3, null);
+		Log.d("res query = ",resultados.toString());
+		String[] dias={"Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"};
+		ArrayList<String> res_dias=new ArrayList<String>();
+		if(resultados.getCount()>0)
+		{
+			while(resultados.moveToNext())
+			{
+				for(String dia:dias)
+				{
+					
+						Log.d(dia,""+resultados.getString(0));
+						if(dia.contains(resultados.getString(0)))
+						{
+							res_dias.add(dia);
+						}
+				}
+			}
+			
+		}else{
+			Log.d("vacio","vacio");
+			bd.close();
+			resultados.close();
+			return new ArrayList<String>();
+		}
+		Log.d("sali de  ","getDiasInsertados");
+
+		bd.close();
+		resultados.close();
+		return res_dias;
 	}
 	public static final HashMap<String, String> getColumnas()
 	{

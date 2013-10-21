@@ -14,6 +14,7 @@ import com.android.gimnasio.api.Usuario;
 
 import android.app.Activity;
 import android.app.ListActivity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -70,6 +71,16 @@ public class SeleccionarMaquinaActivity extends Activity{
 				//si no selecciona maquinas no pasa a la siguiente actividad y envia un mensaje
 				if(ids_maquinas_seleccionadas.size()!=0)
 				{
+					
+					
+					//marca como seleccionado 1 a las maquinas seleccionadas
+					for(int ids:ids_maquinas_seleccionadas)
+					{
+						ContentValues columnas=new ContentValues();
+						columnas.put("seleccionado",1);
+						maquina.editarMaquina(ids, columnas);
+					}
+					//pasa a la siguente actividad
 					Intent i=new Intent(getApplicationContext(), MaquinaEjercicioActivity.class);
 					i.putIntegerArrayListExtra("ids_maquinas_seleccionadas", ids_maquinas_seleccionadas);
 					startActivity(i);
@@ -132,7 +143,16 @@ public class SeleccionarMaquinaActivity extends Activity{
 		 num_row+=1;
 	}
 
-	
+	public void onStart()
+	{
+		super.onStart();
+		for(int id:maquina.getIdsMaquinas())
+		{
+			ContentValues columnas=new ContentValues();
+			columnas.put(maquina.seleccionado_int_4,0);
+			maquina.editarMaquina(id, columnas);
+		}
+	}
 	public LinearLayout crearLinearLayout()
 	{
 		LinearLayout l2=new LinearLayout(this);
