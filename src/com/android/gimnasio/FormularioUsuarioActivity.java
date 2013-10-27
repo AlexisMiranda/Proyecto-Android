@@ -172,6 +172,7 @@ public class FormularioUsuarioActivity extends Activity {
 	{
 		HashMap<String, String> hash_columnas2= hash_columnas;
 		hash_columnas2.remove("sexo");//viene por defecto con 0
+		hash_columnas2.remove("rutina");
 		Iterator<String> key_columnas=hash_columnas2.keySet().iterator();
 		while(key_columnas.hasNext())
 		{
@@ -234,5 +235,9 @@ public class FormularioUsuarioActivity extends Activity {
 		
 	}
 
+	public void kill()
+	{
+		this.finish();
+	}
 	
 }

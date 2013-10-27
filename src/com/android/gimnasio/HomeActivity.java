@@ -36,7 +36,13 @@ public class HomeActivity extends Activity {
 
 	public void enviar(View view){
 
-			Intent intent=new Intent(this,FormularioUsuarioActivity.class);
+		Intent intent=new Intent(this,FormularioUsuarioActivity.class);
+
+			if(usuario.getTieneRutinaCreada(1))
+			{
+				intent=new Intent(this,SeleccionarDiaActivity.class);
+
+			}
 			startActivity(intent);
 
 	

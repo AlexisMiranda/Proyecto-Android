@@ -8,15 +8,19 @@ import com.android.gimnasio.api.Maquina;
 import com.android.gimnasio.api.RequerimientoEjercicio;
 import com.android.gimnasio.api.TipoEjercicio;
 import com.android.gimnasio.api.TipoEjercicioUsuario;
+import com.android.gimnasio.api.Usuario;
 
 import android.R.color;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.util.Log;
@@ -38,6 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
+@SuppressLint("NewApi")
 public class MaquinaEjercicioActivity extends Activity {
 
  
@@ -45,6 +50,7 @@ public class MaquinaEjercicioActivity extends Activity {
 	private ScrollView scroll;
 	private ArrayList<Integer> ids_maquinas_seleccionadas,ids_ejercicios_seleccionados;
 	private Maquina tabla_maquina;
+	private Usuario usuario;
 	private TipoEjercicio tabla_tipo_ejercicio;
 	private TipoEjercicioUsuario tabla_tipoEjercicio_usuario;
 	private RequerimientoEjercicio tabla_requerimiento_ejercicio;
@@ -61,6 +67,7 @@ public class MaquinaEjercicioActivity extends Activity {
         tabla_tipo_ejercicio=new TipoEjercicio(this);
         tabla_tipoEjercicio_usuario=new TipoEjercicioUsuario(this);
         tabla_requerimiento_ejercicio=new RequerimientoEjercicio(this);
+        usuario=new Usuario(this);
         ejercicios_seleccionados_por_maquina=new HashMap<Integer, ArrayList<Integer>>();
         Layout_contenedor=new ArrayList<ScrollView>();
         ids_ejercicios_seleccionados=new ArrayList<Integer>();
@@ -68,7 +75,7 @@ public class MaquinaEjercicioActivity extends Activity {
         entro_en_on_create=true;
         indice_maqui_selec=0;
         scroll=new ScrollView(this);
-        scroll.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+        scroll.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		scroll.addView(crearContenedor2(ids_maquinas_seleccionadas.get(indice_maqui_selec)));
 		Log.d("pase scroll","pase scroll");
 		setContentView(scroll);
@@ -102,20 +109,24 @@ public class MaquinaEjercicioActivity extends Activity {
 	{
 		super.onResume();
 
-		
 
 	}
 	public void onPause()
 	{
 		super.onPause();
+		Log.d("entro en ","pause");
 		indice_maqui_selec-=1;
 		if(indice_maqui_selec>=0)
 		{
-			scroll=new ScrollView(this);
-		    scroll.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		    scroll.addView(crearContenedor2(ids_maquinas_seleccionadas.get(indice_maqui_selec)));
+			this.ejercicios_seleccionados_por_maquina.remove(ids_maquinas_seleccionadas.get(indice_maqui_selec));
+			ids_ejercicios_seleccionados.clear();//borra todos los elementos del array que contiene los ejercicios seleccionados
+			scroll.removeAllViews();//borra todos los hijos de scroll
+			scroll.addView(crearContenedor2(ids_maquinas_seleccionadas.get(indice_maqui_selec)));
 			setContentView(scroll);
+			
 		}
+		Log.d("salgo en ","pause");
+
 		
 	}
 	public void clickEnBoton()
@@ -514,8 +525,7 @@ public void eliminarDatosEnBd(int id_maquina)
 		edit.setFilters(new InputFilter[] {new InputFilter.LengthFilter(5)});
 		return edit;
 	}
-	
-	
+
 	
 }
 

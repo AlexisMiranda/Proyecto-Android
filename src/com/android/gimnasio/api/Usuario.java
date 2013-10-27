@@ -23,9 +23,9 @@ public class Usuario {
 	public static final String estatura_float_4="estatura";//,"real"};
 	public static final String sexo_int_5="sexo";//,"integer"};
 	public static final String peso_float_6="peso";//,"real"};
-
 	public static final String  puntaje_float_7="puntaje";//,"integer"};
 	public static final String imc_float_8="imc";//,"real"};
+	public static final String rutina_int_9="rutina";
 
 
 
@@ -47,7 +47,8 @@ public class Usuario {
 		values.put(Usuario.sexo_int_5, sexo);
 		Float imc=peso/(estatura*estatura);
 		values.put(Usuario.imc_float_8, imc);
-		values.put(puntaje_float_7,0);
+		values.put(Usuario.puntaje_float_7,0);
+		values.put(Usuario.rutina_int_9,0);
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.insert(Usuario.nombreTabla, null, values);
@@ -134,6 +135,16 @@ public class Usuario {
 		return getConsultaToString("select "+Usuario.imc_float_8+
 							" from "+Usuario.nombreTabla+
 							" where "+Usuario.id_primaryKey_0+"="+id_usuario);
+	}
+	public boolean getTieneRutinaCreada(int id_usuario)
+	{
+		String re=getConsultaToString("select "+Usuario.rutina_int_9+
+				" from "+Usuario.nombreTabla+
+				" where "+Usuario.id_primaryKey_0+"="+id_usuario);
+		if(re.contains("1")){
+			return true;
+		}
+		return false;
 	}
 
 	public HashMap<String, String> getInfoUsuario(int id_usuario)

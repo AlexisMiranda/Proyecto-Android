@@ -36,6 +36,7 @@
             android:screenOrientation="portrait"
             
             />
+        
          <activity 
             android:name="com.android.gimnasio.maquinasPorDia.MaquinasPorDiaActivity"
             android:label="MaquinasPorDiaActivity"

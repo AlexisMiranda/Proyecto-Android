@@ -1,12 +1,16 @@
 package com.android.gimnasio.maquinasPorDia;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
+import com.android.gimnasio.EjercicioRealizadoActivity;
 import com.android.gimnasio.R;
 import com.android.gimnasio.api.Maquina;
 import com.android.gimnasio.api.TipoEjercicioUsuario;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +31,7 @@ public class MaquinasPorDiaActivity extends Activity {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maquinas_por_dia);
+        super.setTheme( android.R.style.Theme );
         titulo=(TextView)findViewById(R.id.textView1);
         
         maquina=new Maquina(this);
@@ -36,6 +41,7 @@ public class MaquinasPorDiaActivity extends Activity {
         titulo.setTextColor(Color.parseColor("#08088A"));      
         Toast.makeText(getApplicationContext(),"Dia seleccionado "+dia,Toast.LENGTH_SHORT).show();
         ids=maquina.getMaquinasSeleccionadasPorDia(dia);
+       
         LoadModel(ids,maquina);
         listView = (ListView) findViewById(R.id.listView);
         String[] ids = new String[Items.size()];
@@ -53,6 +59,8 @@ public class MaquinasPorDiaActivity extends Activity {
                 Object o = listView.getItemAtPosition(position);
                 String str=(String)o;//As you are using Default String Adapter
                 Toast.makeText(getApplicationContext(),str,Toast.LENGTH_SHORT).show();
+                Intent i=new Intent(getApplicationContext(), EjercicioRealizadoActivity.class);
+                startActivity(i);
             }
 
 
@@ -63,6 +71,11 @@ public class MaquinasPorDiaActivity extends Activity {
    
     public static void LoadModel( ArrayList<Integer> ids ,Maquina maquina) {
     	Log.d("entro en ","load model");
+
+    	Set<Integer> linkedHashSet = new LinkedHashSet<Integer>();
+		linkedHashSet.addAll(ids);
+		ids.clear();
+		ids.addAll(linkedHashSet);
         Items = new ArrayList<Item>();
         for(int i=0;i<ids.size();i++)
         {
