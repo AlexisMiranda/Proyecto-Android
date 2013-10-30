@@ -57,9 +57,11 @@ public class MaquinasPorDiaActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
                 Object o = listView.getItemAtPosition(position);
-                String str=(String)o;//As you are using Default String Adapter
+                String str=(String)o;
                 Toast.makeText(getApplicationContext(),str,Toast.LENGTH_SHORT).show();
                 Intent i=new Intent(getApplicationContext(), EjercicioRealizadoActivity.class);
+                i.putExtra("dia", dia);
+                i.putExtra("num_maquina_selec",""+MaquinasPorDiaActivity.this.ids.get(Integer.parseInt(str)-1));
                 startActivity(i);
             }
 

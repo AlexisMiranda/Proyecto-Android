@@ -39,7 +39,35 @@ public class TipoEjercicioUsuario {
 		bd.close();
 		
 	}
-	
+	public int getIdTipoEjercicioUsuario(int id_ejercicio,int id_usuario,String dia)
+	{
+		String query="select "+TipoEjercicioUsuario.id_primaryKey_0+
+				" from "+TipoEjercicioUsuario.nombreTabla+
+				" "+"where "+TipoEjercicioUsuario.fku_usuario_2+" = "+id_usuario+
+				" and "+TipoEjercicioUsuario.fkte_tipoEjercicio_1+" = "+id_ejercicio+
+				" and "+TipoEjercicioUsuario.dia_str_3+" = '"+dia+"'";
+		Log.d("query getIdTipoEjercicioUsuario ",query);
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		Cursor resultado=bd.rawQuery(query, null);
+		Log.d("res","cursor");
+		int id=0;
+		if(resultado.getCount()>0)
+		{
+			while(resultado.moveToNext())
+			{
+				id=Integer.parseInt(resultado.getString(0));
+			}
+			Log.d("id",""+id);
+			bd.close();
+			resultado.close();
+			return id;
+		}
+		bd.close();
+		resultado.close();
+		Log.d("id",""+-1);
+		return -1;
+	}
 	public int getIdEjercicio(int id_tipo_ejercicio_usuario)
 	{
 		return Integer.parseInt(getConsultaToString("select "+TipoEjercicioUsuario.fkte_tipoEjercicio_1+
@@ -102,6 +130,7 @@ public class TipoEjercicioUsuario {
 		}
 		return Integer.parseInt(res2);
 	}
+	
 	public ArrayList<Integer> getIdsTypeEjerUserByTypeEjer(int id_tipo_ejercicio)
 	{
 		Log.d(""+TipoEjercicioUsuario.nombreTabla,"ArrayList<Integer> getIdsTypeEjerUserByTypeEjer(int id_tipo_ejercicio)");
@@ -123,6 +152,36 @@ public class TipoEjercicioUsuario {
 		bd.close();
 		resultado.close();
 		return ids;
+		
+	}
+	public ArrayList<Integer> getEjerciciosSeleccionados(int id_maquina,String dia)
+	{
+		Log.d("entre en ","getEjerciciosSeleccionados");
+		Log.d("dia",dia);
+		AdminSQLiteOpenHelper admin=new AdminSQLiteOpenHelper(this.context, null,1);
+		SQLiteDatabase bd=admin.getWritableDatabase();
+		String query=" select te."+TipoEjercicio.id_primaryKey_0+
+				" from "+TipoEjercicioUsuario.nombreTabla +" teu join "+TipoEjercicio.nombreTabla+" te"+
+				" on teu."+TipoEjercicioUsuario.fkte_tipoEjercicio_1+" = te."+TipoEjercicio.id_primaryKey_0+
+				" where te."+TipoEjercicio.fkm_maquina_4+" = "+id_maquina+
+				" and teu."+TipoEjercicioUsuario.dia_str_3+" = '"+dia+"' "+
+				" group by te."+TipoEjercicio.id_primaryKey_0;
+		Log.d("query",query);
+		Cursor res=bd.rawQuery(query,null);
+		ArrayList<Integer> ids_ejer_selec=new ArrayList<Integer>();
+		if(res.getCount()>0)
+		{
+			while(res.moveToNext())
+			{
+				Log.d("fila =",res.getString(0));
+			ids_ejer_selec.add(Integer.parseInt(res.getString(0)));
+			}
+			bd.close();
+			res.close();
+			Log.d("ids ejer sele",ids_ejer_selec.toString());
+			return ids_ejer_selec;
+		}
+		return new ArrayList<Integer>();
 		
 	}
 	public ArrayList<String> getDiasInsertados()

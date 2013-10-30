@@ -47,23 +47,65 @@ public class RequerimientoEjercicio {
 		bd.close();
 	}
 	
-	public int getIdTipoEjercicioUsuario(int id_requerimiento_ejercicio)
+	public int getIdTipoEjercicioUsuario(int id_tipo_ejercicio_usuario)
 	{
 		return Integer.parseInt(getConsultaToString("select "+RequerimientoEjercicio.fkteu_tipoEjercicioUsuario_3+
 													" from "+RequerimientoEjercicio.nombreTabla+
-													" "+"where "+RequerimientoEjercicio.id_primaryKey_0+"="+id_requerimiento_ejercicio));	
+													" "+"where "+RequerimientoEjercicio.fkteu_tipoEjercicioUsuario_3+"="+id_tipo_ejercicio_usuario));	
 	}
-	public String getNombre(int id_requerimiento_ejercicio)
+
+
+	public ArrayList<String> getNombres(int id_tipo_ejercicio_usuario)
 	{
-		return getConsultaToString("select "+RequerimientoEjercicio.nombre_str_1+
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		String query="select "+RequerimientoEjercicio.nombre_str_1+
 				" from "+RequerimientoEjercicio.nombreTabla+
-				" "+"where "+RequerimientoEjercicio.id_primaryKey_0+"="+id_requerimiento_ejercicio);	
+				" "+"where "+RequerimientoEjercicio.fkteu_tipoEjercicioUsuario_3+" = "+id_tipo_ejercicio_usuario+
+				" group by "+RequerimientoEjercicio.nombre_str_1;
+		Log.d("query getNombres",query);
+		Cursor res=bd.rawQuery(query, null);
+		ArrayList<String> array=new ArrayList<String>();
+		if(res.getCount()>0)
+		{
+			while(res.moveToNext())
+			{
+				array.add(res.getString(0));
+			}
+			bd.close();
+			res.close();
+			Log.d("nombres = ",array.toString());
+			return array;
+		}
+		bd.close();
+		res.close();
+		return new ArrayList<String>();
 	}
-	public String getValor(int id_requerimiento_ejercicio)
+	public String getValor(int id_tipo_ejercicio_usuario,String nombre)
 	{
-		return getConsultaToString("select "+RequerimientoEjercicio.valor_str_2+
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		String query="select "+RequerimientoEjercicio.valor_str_2+
 				" from "+RequerimientoEjercicio.nombreTabla+
-				" "+"where "+RequerimientoEjercicio.id_primaryKey_0+"="+id_requerimiento_ejercicio);
+				" where "+RequerimientoEjercicio.fkteu_tipoEjercicioUsuario_3+" = "+id_tipo_ejercicio_usuario+
+				" and "+RequerimientoEjercicio.nombre_str_1+" = '"+nombre+"'";
+		Log.d("query getNombres",query);
+		Cursor res=bd.rawQuery(query, null);
+		String valor="";
+		if(res.getCount()>0)
+		{
+			while(res.moveToNext())
+			{
+				valor=res.getString(0);
+			}
+			bd.close();
+			res.close();
+			Log.d("valor = ",valor);
+			return valor;
+		}
+		bd.close();
+		res.close();
+		return "";
 	}
 
 	public static final HashMap<String, String> getColumnas()
