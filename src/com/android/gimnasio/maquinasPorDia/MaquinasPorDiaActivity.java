@@ -37,7 +37,7 @@ public class MaquinasPorDiaActivity extends Activity {
         maquina=new Maquina(this);
         teu=new TipoEjercicioUsuario(this);
         dia=getIntent().getCharSequenceExtra("dia").toString();
-        titulo.setText("Rutina para el dia "+dia);
+        titulo.setText("\tRutina para el dia "+dia);
         titulo.setTextColor(Color.parseColor("#08088A"));      
         Toast.makeText(getApplicationContext(),"Dia seleccionado "+dia,Toast.LENGTH_SHORT).show();
         ids=maquina.getMaquinasSeleccionadasPorDia(dia);

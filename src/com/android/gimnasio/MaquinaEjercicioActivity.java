@@ -522,7 +522,7 @@ public void eliminarDatosEnBd(int id_maquina)
 		edit.setLayoutParams(lp);
 		edit.setInputType(InputType.TYPE_CLASS_NUMBER);
 		edit.setTag(texto+id);
-		edit.setFilters(new InputFilter[] {new InputFilter.LengthFilter(5)});
+		edit.setFilters(new InputFilter[] {new InputFilter.LengthFilter(2)});
 		return edit;
 	}
 

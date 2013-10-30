@@ -9,6 +9,7 @@ import com.android.gimnasio.api.TipoEjercicioUsuario;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -50,39 +51,36 @@ public class EjercicioRealizadoActivity extends Activity {
 	
 		ejercicios_por_maquina_Selec=tabla_teu.getEjerciciosSeleccionados(num_maquina_selec,dia.substring(0, 3));
 		linear=(LinearLayout)findViewById(R.id.linear);
-		linear.addView(crearImageViewResdid(R.drawable.titulo_seleccion_de_maquinas,200,80,50,0,0,0));
+		TextView titulo=new TextView(this);
+		titulo.setText("\n\n\tReporte Para el dia "+dia);
+		titulo.setTextColor(Color.parseColor("#0B0B61"));
+		titulo.setTextSize(20);
+		titulo.setTextAppearance(this,R.style.AppBaseTheme);
+		linear.addView(titulo);
 		ImageView imagen_maquina=crearImageViewBitmap(tabla_maquina.getImagen(num_maquina_selec, this),200,200,50,0,0,0);
-		imagen_maquina.setOnClickListener(new View.OnClickListener() {
+		linear.addView(imagen_maquina);
+		TextView nombre_maquina=new TextView(this);
+		nombre_maquina.setText("\t\t\t"+tabla_maquina.getNombre(num_maquina_selec).toUpperCase());
+		nombre_maquina.setTextColor(Color.parseColor("#1C1C1C"));
+		nombre_maquina.setTextSize(15);
+		nombre_maquina.setTextAppearance(this,R.style.AppBaseTheme);
+
+		linear.addView(nombre_maquina);
+		linear.addView(crearLayout(ejercicios_por_maquina_Selec.size()));
+		Button b=new Button(this);
+		b.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		b.setText("Puntaje");
+		b.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
-			public void onClick(View arg0)
-			{
-				int res1=0,res2=0,progreso=0;
-				int acumulador=0;
-		        float porciento;
-				for(int num_edit=0;num_edit<(3*ejercicios_por_maquina_Selec.size());num_edit++)
-				{      
-					Log.d("indice",""+num_edit);
-					TextView por =(TextView)linear.findViewWithTag("porcentaje"+(num_edit));
-					EditText edit=(EditText)linear.findViewWithTag("edit"+num_edit);
-					TextView rsp =(TextView)linear.findViewWithTag("text"+(num_edit));
-			        Log.d("edit",edit.getText().toString());
-					res1=Integer.parseInt(edit.getText().toString());
-					Log.d("text",rsp.getText().toString());
-					 res2=Integer.parseInt(rsp.getText().toString());
-					 porciento=((float)res1*(float)100)/(float)res2;	 
-					 por.setText(" "+(int)porciento+"%  ");
-					 acumulador= (int) (porciento+acumulador);					
-				}
-				acumulador=acumulador/(3*ejercicios_por_maquina_Selec.size());
-				TextView acumul =(TextView)linear.findViewWithTag("acumulador");
-				acumul.setText("   progreso="+acumulador+"% ");
+			public void onClick(View v) {
 
+				calcularPuntaje();
 			}
 		});
-		linear.addView(imagen_maquina);
-		linear.addView(crearLayout(ejercicios_por_maquina_Selec.size()));
-		
+		linear.addView(b);
+		calcularPuntaje();
+
 	}
 
 	public LinearLayout crearLayout(int num_filas)
@@ -99,10 +97,8 @@ public class EjercicioRealizadoActivity extends Activity {
 		lp.setMargins(110, 10, 2, 5);
 		linear_horizontal1.setLayoutParams(lp);
 		ArrayList<String> params_ejercicios=tabla_rqe.getNombres(tabla_teu.getIdTipoEjercicioUsuario(ejercicios_por_maquina_Selec.get(0), 1, dia.substring(0,3)));
-		Log.d("****params****",params_ejercicios.toString());
 		for(int col=0;col<params_ejercicios.size();col++)
 		{
-			Log.d("****params****"+col,params_ejercicios.get(col));
 		         TextView t2= new TextView(this);//crearTextViewMathParent("param_"+params_ejercicios.get(col),params_ejercicios.get(col),1, 5, 2, 2);
 			    t2.setText(params_ejercicios.get(col)+" ");
 		         linear_horizontal1.addView(t2);
@@ -122,16 +118,19 @@ public class EjercicioRealizadoActivity extends Activity {
 			for(int col=0;col<params_ejercicios.size();col++)
 			{
 
-						TextView txt=crearTextView("text"+contedit,"", 10,20,2, 2, 0, 2);
+						TextView txt=crearTextView("text"+contedit,"", 19,20,0, 2, 0, 2);
+						//TextView txt=new TextView(this);
 						txt.setText(""+tabla_rqe.getValor(tabla_teu.getIdTipoEjercicioUsuario(ejercicios_por_maquina_Selec.get(fila), 1, dia.substring(0, 3)), params_ejercicios.get(col)));
-						EditText edit=crearEditText(40,40,2, 2, 0, 2);
+						//txt.setTag("text"+contedit);
+						//txt.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+						EditText edit=crearEditText(40,40,1, 2, 0, 2);
 						/*edit.setOnKeyListener(new View.OnKeyListener() {
 						});*/
 
 						edit.setTag("edit"+contedit);
 						contedit++;
 						edit.setInputType(InputType.TYPE_CLASS_NUMBER);
-						edit.setFilters(new InputFilter[] {new InputFilter.LengthFilter(3)});
+						edit.setFilters(new InputFilter[] {new InputFilter.LengthFilter(2)});
 						linear_horizontal.addView(txt);
 						linear_horizontal.addView(edit);
 	
@@ -151,7 +150,7 @@ public class EjercicioRealizadoActivity extends Activity {
 					int heigth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, getResources().getDisplayMetrics());
 					porcentaje.setLayoutParams(new LinearLayout.LayoutParams(width,heigth));
 					porcentaje.setInputType(InputType.TYPE_CLASS_NUMBER);
-					porcentaje.setText("90%");
+					porcentaje.setText("");
 					porcentaje.setTag("porcentaje"+id);
 					id++;
 					linear_horizontal2.addView(porcentaje);
@@ -195,7 +194,40 @@ public class EjercicioRealizadoActivity extends Activity {
 		return linear_vertical;
 		
 	}
-	
+	public void calcularPuntaje()
+	{
+		int actual=0,anterior=0;
+		int acumulador=0;
+        double porciento;
+		for(int num_edit=0;num_edit<(3*ejercicios_por_maquina_Selec.size());num_edit++)
+		{      
+			Log.d("indice",""+num_edit);
+			TextView por =(TextView)linear.findViewWithTag("porcentaje"+(num_edit));
+			EditText edit=(EditText)linear.findViewWithTag("edit"+num_edit);
+			TextView rsp =(TextView)linear.findViewWithTag("text"+(num_edit));
+	        Log.d("edit",edit.getText().toString());
+	        actual=Integer.parseInt(edit.getText().toString());
+			Log.d("text",rsp.getText().toString());
+			anterior=Integer.parseInt(rsp.getText().toString());
+			 /*
+			  * anterior 100
+			  * actual   x
+			  */
+			 if(actual!=0){
+				 porciento=Math.abs((100*actual))/anterior;
+			 }else{
+				 porciento=0;
+			 }
+			 Log.d("pociento",porciento+"");
+			 por.setText(" "+porciento+"%  ");
+			 acumulador= (int) (porciento+acumulador);					
+		}
+		acumulador=acumulador/(3*ejercicios_por_maquina_Selec.size());
+		TextView acumul =(TextView)linear.findViewWithTag("acumulador");
+		acumul.setText("   progreso="+acumulador+"% ");
+		
+	}
+	/*
 	public boolean eventoKeyEditText()
 	{
 		Log.d("hijo ",linear.toString());
@@ -218,7 +250,7 @@ public class EjercicioRealizadoActivity extends Activity {
 		}
 		Log.d("puntaje total= ",""+(promedio));
 		return true;
-	}
+	}*/
 	private TextView crearTextView(String tag,String texto,int w,int h,int left,int top,int right,int bottom) {
 		
 		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, w, getResources().getDisplayMetrics());

@@ -26,14 +26,22 @@ public class HomeActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
-
 		b1=(Button)findViewById(R.id.button1);
 		usuario=new Usuario(this);
 		maquina=new Maquina(this);
-		InsertarDatos.setDeDatos(this, 1);
-	
+
 	}
 
+	public void onStart()
+	{
+		super.onStart();
+		if(usuario.getTieneRutinaCreada(1))//usuario ingreso su rutina
+		{
+			b1.setText("Ver Rutina");
+		}else{
+			InsertarDatos.setDeDatos(this, 1);
+		}
+	}
 	public void enviar(View view){
 
 		Intent intent=new Intent(this,FormularioUsuarioActivity.class);

@@ -35,7 +35,7 @@ import android.widget.ListView;
 
 public class SeleccionarDiaActivity extends ListActivity {
 
-	private ArrayList<String> dias;//={"Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"};
+	private ArrayList<String> dias;
 	private ListView lview;
 	private TipoEjercicioUsuario ejercicio_usuario;
 	private TipoEjercicio tipo_ejercicio;
@@ -55,47 +55,56 @@ public class SeleccionarDiaActivity extends ListActivity {
 		Log.d("entro en actividad",getApplication().toString());
 		ultima_maquina_seleccionada=getIntent().getStringExtra("ultima_maquina_seleccionada");
 		Log.d("ultima_maquina_seleccionada",""+ultima_maquina_seleccionada);
-		/*
-		 * eliminar los parametros ingresados por la ultima maquina seleccionada
-		 */
-		dias=ejercicio_usuario.getDiasInsertados();
+		dias=getDiasOrdenados(ejercicio_usuario.getDiasInsertados());
+		
 		Log.d("dias res",dias.toString());
 	setTheme(CONTEXT_INCLUDE_CODE);
 		
 	setListAdapter(new ArrayAdapter<String>(this, R.layout.activity_seleccionar_dia, android.R.id.text1, dias));
-	if(ultima_maquina_seleccionada!=null)
+	if(ultima_maquina_seleccionada!=null || (usuario.getTieneRutinaCreada(1)==false) )
+	{
 		validarRutinaDeEjercicios();
+	}
 	}
 
 	public void onBackPressed() 
 	{
-		if(ultima_maquina_seleccionada!=null)
+		Log.d("usuario= rutina",""+usuario.getTieneRutinaCreada(1));
+		if(!usuario.getTieneRutinaCreada(1))
 		{
-			ContentValues columnas=new ContentValues();
-			columnas.put(Usuario.rutina_int_9,0);
-			usuario.editarUsuario(1, columnas);
-			if(Integer.parseInt(ultima_maquina_seleccionada)!=-1)
+			if(ultima_maquina_seleccionada!=null )
 			{
-				ArrayList<Integer> ejercicios=tipo_ejercicio.getIdsTipoEjercicios(Integer.parseInt(ultima_maquina_seleccionada));
-		
-				for(int id_tipo_ejer:ejercicios)
+				ContentValues columnas=new ContentValues();
+				columnas.put(Usuario.rutina_int_9,0);
+				usuario.editarUsuario(1, columnas);
+				if(Integer.parseInt(ultima_maquina_seleccionada)!=-1)
 				{
-					Log.d("tipo_ejercicio = =>",id_tipo_ejer+"");
-		
-					ArrayList<Integer> ids_tipo_ejercicio_usuario=ejercicio_usuario.getIdsTypeEjerUserByTypeEjer(id_tipo_ejer);
-					Log.d("eliminarDatosEnB","ids ids_tipo_ejercicios_usuario.llamada a la api "+ids_tipo_ejercicio_usuario.toString());
-					for(int id_tipo_ejer_user:ids_tipo_ejercicio_usuario)
+					ArrayList<Integer> ejercicios=tipo_ejercicio.getIdsTipoEjercicios(Integer.parseInt(ultima_maquina_seleccionada));
+			
+					for(int id_tipo_ejer:ejercicios)
 					{
-						tabla_requerimiento_ejer.eliminarReqEjerPorTipoEjerUser(id_tipo_ejer_user);
-						Log.d("eliminando = ","id tipo ejercicio = "+id_tipo_ejer_user);
+						Log.d("tipo_ejercicio = =>",id_tipo_ejer+"");
+			
+						ArrayList<Integer> ids_tipo_ejercicio_usuario=ejercicio_usuario.getIdsTypeEjerUserByTypeEjer(id_tipo_ejer);
+						Log.d("eliminarDatosEnB","ids ids_tipo_ejercicios_usuario.llamada a la api "+ids_tipo_ejercicio_usuario.toString());
+						for(int id_tipo_ejer_user:ids_tipo_ejercicio_usuario)
+						{
+							tabla_requerimiento_ejer.eliminarReqEjerPorTipoEjerUser(id_tipo_ejer_user);
+							Log.d("eliminando = ","id tipo ejercicio = "+id_tipo_ejer_user);
+						}
+						ejercicio_usuario.eliminarTipoEjerUsuarioPorTipoEjer(id_tipo_ejer);
+						Log.d("eliminando = ","id tipo ejercicio usuario = "+id_tipo_ejer);
 					}
-					ejercicio_usuario.eliminarTipoEjerUsuarioPorTipoEjer(id_tipo_ejer);
-					Log.d("eliminando = ","id tipo ejercicio usuario = "+id_tipo_ejer);
 				}
 			}
+
+		}else{
+			Intent i=new Intent(this, HomeActivity.class);
+			i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(i);
 		}
-		this.finish();
-		
+		finish();
+
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -142,6 +151,20 @@ public class SeleccionarDiaActivity extends ListActivity {
 		AlertDialog alert = builder.create();
 		alert.show();
 		
+	}
+	public ArrayList<String> getDiasOrdenados(ArrayList<String> dias)
+	{
+		String[] dias_ordenados={"Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"};
+		ArrayList<String> dias_aux=new ArrayList<String>();
+		
+		for(String dia:dias_ordenados)
+		{
+			if(dias.contains((Object)dia))
+				{
+				dias_aux.add(dia);
+				}
+		}
+		return dias_aux;
 	}
     
 }
