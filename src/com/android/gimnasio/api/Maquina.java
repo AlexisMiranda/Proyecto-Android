@@ -22,11 +22,10 @@ public class Maquina {
 	
 	public static Context context;
 	public static final String nombreTabla="maquina";
-	public static final String id_primaryKey_0="id";;
+	public static final String id_primaryKey_0="id";
 	public static final String  nombre_str_1="nombre";
 	public static final String  tipoMaquina_str_2="tipoMaquina";
 	public static final String  rutaImagen_str_3="rutaImagen";
-	public static final String  seleccionado_int_4="seleccionado";//indica si una maquina es seleccionada por el usuario
 
 	
 	public Maquina(Context context) {
@@ -39,7 +38,6 @@ public class Maquina {
 		values.put(Maquina.nombre_str_1, nombre);
 		values.put(Maquina.tipoMaquina_str_2,tipo_de_maquina);
 		values.put(Maquina.rutaImagen_str_3,ruta_imagen);
-		values.put(Maquina.seleccionado_int_4,seleccionada);
 
 		if(id_maquina>0)
 			values.put(id_primaryKey_0,id_maquina);
@@ -55,7 +53,6 @@ public class Maquina {
 		values.put( Maquina.nombre_str_1, nombre);
 		values.put(Maquina.tipoMaquina_str_2,tipo_de_maquina);
 		values.put(Maquina.rutaImagen_str_3,ruta_imagen);
-		values.put(Maquina.seleccionado_int_4,seleccionada);
 
 		if(id_maquina>0)
 			values.put(id_primaryKey_0,id_maquina);
@@ -106,7 +103,7 @@ public class Maquina {
 		resultado.close();
 		return ids_maquinas;
 	}
-	public ArrayList<Integer> getMaquinasSeleccionadas()
+	public ArrayList<Integer> getMaquinasSeleccionadas(int id_usuario)
 	{
 		/*
 		 * Devuelve el id de las maquinas que han sido seleccionadas por el usuari
@@ -114,9 +111,17 @@ public class Maquina {
 		ArrayList<Integer> ids=new ArrayList<Integer>();
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
-		Cursor resultado=bd.rawQuery("select "+Maquina.id_primaryKey_0+
-									" from "+Maquina.nombreTabla+
-									" where "+Maquina.seleccionado_int_4+" = 1",null);
+		String query="select m."+Maquina.id_primaryKey_0+
+				" from "+TipoEjercicio.nombreTabla+" te join "+
+				TipoEjercicioUsuario.nombreTabla+" teu on("+
+				"te."+TipoEjercicio.id_primaryKey_0+") join "+
+				Maquina.nombreTabla+"m on("+Maquina.id_primaryKey_0+
+				" = "+TipoEjercicio.fkm_maquina_4+")"+
+				" = teu."+TipoEjercicioUsuario.fkte_tipoEjercicio_1+
+				" where teu."+TipoEjercicioUsuario.fku_usuario_2+" = "+id_usuario+
+				" group by "+Maquina.id_primaryKey_0;
+		Log.d("query",query);
+		Cursor resultado=bd.rawQuery(query,null);
 		if(resultado.getCount()>0)
 		{
 			while(resultado.moveToNext())
@@ -135,34 +140,42 @@ public class Maquina {
 	/*
 	 * Recibe como parametro un dia Lunes,Martes
 	 */
-	public ArrayList<Integer> getMaquinasSeleccionadasPorDia(String dia)
+	public ArrayList<Integer> getMaquinasSeleccionadasPorDia(int id_usuario,String dia)
 	{
 		/*
 		 * En la base de datos los dias se guardan como lun,mar..
 		 */
 		Log.d("entre en getMaquinasSeleccionadasPorDia",dia);
-		TipoEjercicioUsuario  teu=new TipoEjercicioUsuario(context);
-		TipoEjercicio te=new TipoEjercicio(context);
-		Log.d("todos los ejercicios",te.getConsultaToString(" select * from "+TipoEjercicio.nombreTabla));
-		dia=dia.substring(0, 3);
-		Log.d("dia seleccionado",dia);
-		ArrayList<Integer> ids_maquinas=new ArrayList<Integer>();
-		ArrayList<Integer> ids_ejercicios= ids_ejercicios=teu.getIdEjercicioPorDia(dia);
-        Log.d("todos los ejercicios",ids_ejercicios.toString());
-        for(int id_ejer:ids_ejercicios)
-        {
-        	Log.d("id_ejer",""+id_ejer);
-        	if(!ids_maquinas.contains(id_ejer)) // si no contine a esa maquina la agrega
-        	{
-        		Log.d("entro en get ids maquina","id maquina");
-        		int id_maquina=te.getIdMaquina(id_ejer);
-        		Log.d("id_maquina",""+id_maquina);
+		ArrayList<Integer> ids=new ArrayList<Integer>();
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		String query="select m."+Maquina.id_primaryKey_0+
+				" from "+TipoEjercicio.nombreTabla+" te join "+
+				TipoEjercicioUsuario.nombreTabla+" teu on("+
+				"te."+TipoEjercicio.id_primaryKey_0+" = teu."+TipoEjercicioUsuario.fkte_tipoEjercicio_1+
+				") join "+Maquina.nombreTabla+" m on(m."+Maquina.id_primaryKey_0+
+				" = te."+TipoEjercicio.fkm_maquina_4+")"+
+				" where teu."+TipoEjercicioUsuario.fku_usuario_2+" = "+id_usuario+
+				" and teu."+TipoEjercicioUsuario.dia_str_3+" = '"+dia+"'"+
+				" group by m."+Maquina.id_primaryKey_0;
+		Log.d("query",query);
+		Cursor resultado=bd.rawQuery(query,null);
+		if(resultado.getCount()>0)
+		{
+			while(resultado.moveToNext())
+			{
+				ids.add(Integer.parseInt(resultado.getString(0)));
+			}
+		}else{
+			bd.close();
+			resultado.close();
+			return new ArrayList<Integer>();
+		}
+		bd.close();
+		resultado.close();
+        Log.d("salgo de getMaquinasSeleccionadasPorDia",ids.toString());
 
-        	ids_maquinas.add(id_maquina);
-        	}
-        }
-        Log.d("salgo de getMaquinasSeleccionadasPorDia",ids_maquinas.toString());
-		return ids_maquinas;
+		return ids;
 	}
 	@SuppressLint("UseSparseArrays")
 	public static final HashMap<String, String> getColumnas()
@@ -247,12 +260,36 @@ public class Maquina {
 		SQLiteDatabase bd = admin.getReadableDatabase();
 		Cursor resultados = bd.rawQuery("select * from "+Maquina.nombreTabla+
 										" where "+Maquina.id_primaryKey_0+"="+id_maquina, null);
-		bd.close();
-		;
+		
 		if (resultados.getCount()>0){
 			resultados.close();
+			bd.close();
 
 			return true;
+		}	
+		bd.close();
+		resultados.close();
+
+		return false;
+	}
+	public boolean existenMaquinas(int num)
+	{
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
+		SQLiteDatabase bd = admin.getReadableDatabase();
+		Cursor resultados = bd.rawQuery("select * from "+Maquina.nombreTabla, null);
+		bd.close();
+		int cnt=0;
+		if (resultados.getCount()>0){
+			while(resultados.moveToNext())
+			{
+				cnt+=1;
+			}
+			resultados.close();
+			if(cnt==num)
+			{
+				return true;
+			}
+			return false;
 		}	
 		resultados.close();
 

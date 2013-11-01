@@ -20,6 +20,7 @@ public class TipoEjercicioUsuario {
 	public static final String  fkte_tipoEjercicio_1="fkte";
 	public static final String  fku_usuario_2="fku";
 	public static final String dia_str_3="dia";
+	//public static final String puntaje_float_4="puntaje";
 	
 	public TipoEjercicioUsuario(Context context)
 	{
@@ -31,6 +32,7 @@ public class TipoEjercicioUsuario {
 		values.put(TipoEjercicioUsuario.fkte_tipoEjercicio_1, id_tipo_ejercicio);
 		values.put(TipoEjercicioUsuario.fku_usuario_2,id_usuario);
 		values.put(TipoEjercicioUsuario.dia_str_3,dia);
+		//values.put(TipoEjercicioUsuario.puntaje_float_4,0);
 		if(id_tipo_ejercicio_usuario>0)
 			values.put(TipoEjercicioUsuario.id_primaryKey_0,id_tipo_ejercicio_usuario);
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
@@ -39,8 +41,18 @@ public class TipoEjercicioUsuario {
 		bd.close();
 		
 	}
+	public void editarTipoEjercicioUsuario(int id_tipo_ejercicio_usuario,ContentValues columnas)
+	{
+		Log.d("editarTipoEjercicioUsuario",""+id_tipo_ejercicio_usuario);
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		bd.update(TipoEjercicioUsuario.nombreTabla, columnas, TipoEjercicioUsuario.id_primaryKey_0+"="+id_tipo_ejercicio_usuario, null);
+		bd.close();
+		;
+		}
 	public int getIdTipoEjercicioUsuario(int id_ejercicio,int id_usuario,String dia)
 	{
+		Log.d("getIdTipoEjercicioUsuario","id_u="+id_usuario+" id_ejer ="+id_ejercicio+" dia="+dia);
 		String query="select "+TipoEjercicioUsuario.id_primaryKey_0+
 				" from "+TipoEjercicioUsuario.nombreTabla+
 				" "+"where "+TipoEjercicioUsuario.fku_usuario_2+" = "+id_usuario+
@@ -112,6 +124,7 @@ public class TipoEjercicioUsuario {
 		resultado.close();
 		return ids;
 	}
+
 	public int getUltimoIdInsertado()
 	{
 		Log.d(TipoEjercicioUsuario.nombreTabla,"open getUltimoIdInsertado");
@@ -184,7 +197,7 @@ public class TipoEjercicioUsuario {
 		return new ArrayList<Integer>();
 		
 	}
-	public ArrayList<String> getDiasInsertados()
+	public ArrayList<String> getDiasInsertados(int id_usuario)
 	{
 		/*
 		 * Obtiene los dias que existen en la base de datos
@@ -192,9 +205,11 @@ public class TipoEjercicioUsuario {
 		Log.d("entre en ","getDiasInsertados");
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
-		Cursor resultados = bd.rawQuery(" select "+TipoEjercicioUsuario.dia_str_3+
-										" from "+TipoEjercicioUsuario.nombreTabla+
-										" group by "+TipoEjercicioUsuario.dia_str_3, null);
+		String query=" select teu."+TipoEjercicioUsuario.dia_str_3+
+				" from "+TipoEjercicioUsuario.nombreTabla+" teu"+
+				" where teu."+TipoEjercicioUsuario.fku_usuario_2+" = "+id_usuario+
+				" group by teu."+TipoEjercicioUsuario.dia_str_3;
+		Cursor resultados = bd.rawQuery(query, null);
 		Log.d("res query = ",resultados.toString());
 		String[] dias={"Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"};
 		ArrayList<String> res_dias=new ArrayList<String>();
@@ -315,13 +330,14 @@ public class TipoEjercicioUsuario {
 		
 		bd.close();
 	}
-	public void eliminarTipoEjerUsuarioPorTipoEjer(int id_tipoEjercicio)
+	public void eliminarTipoEjerUsuarioPorTipoEjer(int id_tipoEjercicio,int id_usuario)
 	{
 		Log.d(TipoEjercicioUsuario.nombreTabla,"eliminarTipoEjerUsuarioPorTipoEjer(int id_tipoEjercicio)");
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.execSQL("delete from "+TipoEjercicioUsuario.nombreTabla+
-					" where "+TipoEjercicioUsuario.fkte_tipoEjercicio_1+" = "+id_tipoEjercicio);
+					" where "+TipoEjercicioUsuario.fkte_tipoEjercicio_1+" = "+id_tipoEjercicio+
+					" and "+TipoEjercicioUsuario.fku_usuario_2+" = "+id_usuario	);
 		bd.close();
 	}
 }

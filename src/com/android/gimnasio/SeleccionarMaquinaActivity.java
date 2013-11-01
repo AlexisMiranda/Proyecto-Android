@@ -47,16 +47,20 @@ public class SeleccionarMaquinaActivity extends Activity{
 	private TextView titulo;
 	private ArrayList<Integer> ids_maquinas,ids_maquinas_seleccionadas;
 	private LinearLayout l1;
-	private int num_row=0;
+	private int num_row=0,id_usuario_loggeado;
 	private Button siguiente;
+	private Usuario usuario;
 	public void onCreate(Bundle savedInstanceState)
 	{ 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_seleccionar_maquina);
 		l1=(LinearLayout)findViewById(R.id.linear);
+		l1.addView(desloggear(),num_row);
+		num_row+=1;
+		usuario=new Usuario(this);
 		maquina=new Maquina(this);
 		ids_maquinas=maquina.getIdsMaquinas();
-
+		id_usuario_loggeado=usuario.getIdUsuarioLoggeado();
 		titulo=new TextView(this);
 		siguiente=new Button(this);
 		siguiente.setLayoutParams(new LinearLayout.LayoutParams(
@@ -71,27 +75,17 @@ public class SeleccionarMaquinaActivity extends Activity{
 				//si no selecciona maquinas no pasa a la siguiente actividad y envia un mensaje
 				if(ids_maquinas_seleccionadas.size()!=0)
 				{
-					
-					
-					//marca como seleccionado 1 a las maquinas seleccionadas
-					for(int ids:ids_maquinas_seleccionadas)
-					{
-						ContentValues columnas=new ContentValues();
-						columnas.put("seleccionado",1);
-						maquina.editarMaquina(ids, columnas);
-					}
+
 					//pasa a la siguente actividad
 					Intent i=new Intent(getApplicationContext(), MaquinaEjercicioActivity.class);
 					i.putIntegerArrayListExtra("ids_maquinas_seleccionadas", ids_maquinas_seleccionadas);
 					startActivity(i);
 				}else{
 					Toast.makeText(getApplicationContext(), "Seleccione alguna maquina", Toast.LENGTH_LONG).show();
-
 				}
 				
 			}
 		});
-		
 		//si el numero de elementos de la lista es impar,entonces num_filas teendra numero par
 		int num_filas=(ids_maquinas.size()%2==1)?ids_maquinas.size()-1:ids_maquinas.size();
 		int resto=ids_maquinas.size()%2;
@@ -143,15 +137,11 @@ public class SeleccionarMaquinaActivity extends Activity{
 		 num_row+=1;
 	}
 
-	public void onStart()
-	{
-		super.onStart();
-		for(int id:maquina.getIdsMaquinas())
-		{
-			ContentValues columnas=new ContentValues();
-			columnas.put(maquina.seleccionado_int_4,0);
-			maquina.editarMaquina(id, columnas);
-		}
+	public void onBackPressed(){
+		Intent i=new Intent(this, HomeActivity.class);
+		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(i);
+		finish();
 	}
 	public LinearLayout crearLinearLayout()
 	{
@@ -205,11 +195,59 @@ public class SeleccionarMaquinaActivity extends Activity{
 	{
 		titulo.setBackgroundResource(R.drawable.titulo_seleccion_de_maquinas);
 		titulo.setTextSize(50);
-		titulo.setPadding(20, 20,0,0);
+		titulo.setPadding(20,2,0,0);
 		l1.addView(titulo,num_row,new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		num_row+=1;
-		l1.addView(new TextView(this),num_row);
-		num_row+=1;
+		
+	}
+	public TextView desloggear()
+	{
+		TextView text=new TextView(this);
+		Usuario u=new Usuario(this);
+		int id_usuario_loggeado=u.getIdUsuarioLoggeado();
+		String nombre=u.getNombre(id_usuario_loggeado);
+		text.setText(nombre.substring(0,1).toUpperCase()+nombre.substring(1)+"\tX Cerrar Sesion");
+		LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT);
+		lp.setMargins(100, 5, 0, 5);
+		text.setLayoutParams(lp);
+		text.setTextSize(18);
+		text.setTextColor(Color.parseColor("#DF0101"));
+		text.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				//lo envio a login activity
+				Toast.makeText(getApplicationContext(),"Usuario desloggeado",Toast.LENGTH_SHORT).show();
+				Intent i=new Intent(getApplicationContext(), LoginActivity.class);
+				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(i);
+			}
+		});
+		return text;
+		
 	}
 	
+	public TextView datosUsuario()
+	{
+		TextView text=new TextView(this);
+		Usuario u=new Usuario(this);
+		int id_usuario_loggeado=u.getIdUsuarioLoggeado();
+		String nombre=u.getNombre(id_usuario_loggeado);
+		String peso=u.getPeso(id_usuario_loggeado)+"";
+		String edad =u.getEdad(id_usuario_loggeado);
+		String estatura=""+u.getEstatura(id_usuario_loggeado);
+		String imc =u.getImc(id_usuario_loggeado);
+		String sexo=u.getSexo(id_usuario_loggeado);
+		text.setText("Datos del Usuario: \n\n"+
+					"Nombre: "+nombre+"\nPeso: "+peso+"\n"+
+					"Estatura: "+estatura+"\nEdad: "+edad+"\n"+
+					"Sexo: "+sexo+"\nImc: "+imc+"\n");
+		LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT);
+		lp.setMargins(10, 5, 2, 10);
+		text.setLayoutParams(lp);
+		text.setTextSize(15);
+		text.setTextColor(Color.parseColor("#29088A"));
+		return text;
+		
+	}
 }

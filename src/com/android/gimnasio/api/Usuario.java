@@ -18,7 +18,7 @@ public class Usuario {
 	public static final String nombreTabla="usuario";
 	public static final String id_primaryKey_0="id";//};
 	public static final String  nombre_str_1="nombre";//,"text"};
-	//public static final String  apellido_str_2="apellido";//,"text"};
+	public static final String  passwd_str_2="passwd";//,"text"};
 	public static final String edad_int_3="edad";//,"integer"};
 	public static final String estatura_float_4="estatura";//,"real"};
 	public static final String sexo_int_5="sexo";//,"integer"};
@@ -26,6 +26,8 @@ public class Usuario {
 	public static final String  puntaje_float_7="puntaje";//,"integer"};
 	public static final String imc_float_8="imc";//,"real"};
 	public static final String rutina_int_9="rutina";
+	public static final String loggeado_int_10="loggeado";
+
 
 
 
@@ -34,13 +36,14 @@ public class Usuario {
 		this.context=context;
 		
 	}
-	public void crearUsuario(int id_usuario,String nombre,int edad,float estatura,float peso,int sexo)
+	public void crearUsuario(int id_usuario,String nombre,String passwd,int edad,float estatura,float peso,int sexo)
 	{
 		
 		ContentValues values=new ContentValues();
 		if(id_usuario>0)
 			values.put(Usuario.id_primaryKey_0, id_usuario);
 		values.put(Usuario.nombre_str_1, nombre);
+		values.put(Usuario.passwd_str_2, passwd);
 		values.put(Usuario.edad_int_3, edad);
 		values.put(Usuario.estatura_float_4, estatura);
 		values.put(Usuario.peso_float_6, peso);	
@@ -49,6 +52,8 @@ public class Usuario {
 		values.put(Usuario.imc_float_8, imc);
 		values.put(Usuario.puntaje_float_7,0);
 		values.put(Usuario.rutina_int_9,0);
+		values.put(Usuario.loggeado_int_10,0);
+
 		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
 		SQLiteDatabase bd = admin.getWritableDatabase();
 		bd.insert(Usuario.nombreTabla, null, values);
@@ -91,7 +96,7 @@ public class Usuario {
 		
 		return getConsultaToString("select "+Usuario.nombre_str_1+
 								" from "+Usuario.nombreTabla+
-								" where "+Usuario.id_primaryKey_0+"="+id_usuario);
+								" where "+Usuario.id_primaryKey_0+"="+id_usuario).replace("\n","").replace("\t","");
 		
 	}
 
@@ -110,7 +115,7 @@ public class Usuario {
 		
 		return getConsultaToString("select "+Usuario.edad_int_3+
 				" from "+Usuario.nombreTabla+
-				" where "+Usuario.id_primaryKey_0+"="+id_usuario);
+				" where "+Usuario.id_primaryKey_0+"="+id_usuario).replace("\n","").replace("\t","");
 	}
 	public float getEstatura(int id_usuario){
 
@@ -134,19 +139,32 @@ public class Usuario {
 
 		return getConsultaToString("select "+Usuario.imc_float_8+
 							" from "+Usuario.nombreTabla+
-							" where "+Usuario.id_primaryKey_0+"="+id_usuario);
+							" where "+Usuario.id_primaryKey_0+"="+id_usuario).replace("\n","").replace("\t","");
 	}
 	public boolean getTieneRutinaCreada(int id_usuario)
 	{
-		String re=getConsultaToString("select "+Usuario.rutina_int_9+
+		Log.d("getTieneRutinaCreada",getClass().toString());
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(this.context,null, 1);
+		SQLiteDatabase bd = admin.getWritableDatabase();
+		String query=" select "+Usuario.id_primaryKey_0+
 				" from "+Usuario.nombreTabla+
-				" where "+Usuario.id_primaryKey_0+"="+id_usuario);
-		if(re.contains("1")){
-			return true;
+				" where "+Usuario.id_primaryKey_0+" = "+id_usuario+
+				" and "+Usuario.rutina_int_9+" = 1 ";
+		Log.d("query",query);
+		Cursor resultado=bd.rawQuery(query,null);
+		boolean tiene_rutina=false;
+		if(resultado.getCount()>0)
+		{
+			while(resultado.moveToNext()){
+			tiene_rutina=true;
+			}
 		}
-		return false;
-	}
+		bd.close();
+		resultado.close();
 
+		return tiene_rutina;
+	}
+	
 	public HashMap<String, String> getInfoUsuario(int id_usuario)
 	{
 		HashMap<String, String> info=new HashMap<String, String>();
@@ -246,12 +264,120 @@ public class Usuario {
 
 	public boolean existeUsuario(int id_usuario)
 	{
+		Log.d("existeUsuario",getClass().toString());
+
 		String query=getConsultaToString("select * from usuario where "+Usuario.id_primaryKey_0+" = "+id_usuario);
 		if(query.equals(""))
 		{
 			return false;
 		}
 		return true;
+	}
+	
+	public boolean existeUsuarioEnBd()
+	{
+		Log.d("existeUsuarioEnBd",getClass().toString());
+
+		String query=getConsultaToString("select * from usuario");
+		if(query.equals(""))
+		{
+			return false;
+		}
+		return true;
+	}
+	public boolean existeUsuarioLoggeado()
+	{
+		Log.d("existeUsuarioLoggeado",getClass().toString());
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
+		SQLiteDatabase bd = admin.getReadableDatabase();
+		Cursor resultados = bd.rawQuery(" select "+Usuario.id_primaryKey_0+
+										" from "+Usuario.nombreTabla+
+										" where "+Usuario.loggeado_int_10+" = 1", null);
+		boolean existe=false;
+		if (resultados.getCount()>0) 
+		{
+			existe=true;
+		}
+		bd.close();
+		resultados.close();
+		Log.d("existe usuario loggeado",existe+"");
+		return existe;
+	}
+	public int getIdUsuario(String nombre,String passwd)
+	{
+		Log.d("getIdUsuario",getClass().toString());
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
+		SQLiteDatabase bd = admin.getReadableDatabase();
+		Cursor resultados = bd.rawQuery(" select "+Usuario.id_primaryKey_0+
+										" from "+Usuario.nombreTabla+
+										" where "+Usuario.nombre_str_1+" = '"+nombre+"' "+
+										" and "+Usuario.passwd_str_2+" = '"+passwd+"' ", null);
+		int id=0;
+		if (resultados.getCount()>0) 
+		{
+			while(resultados.moveToNext())
+			{
+				id=Integer.parseInt(resultados.getString(0));
+			}
+			bd.close();		
+			resultados.close();
+
+			return id;
+		}
+		bd.close();
+		resultados.close();
+		return -1;
+	}
+	public int getIdUsuario(String nombre)
+	{
+		Log.d("getIdUsuario",getClass().toString());
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
+		SQLiteDatabase bd = admin.getReadableDatabase();
+		Cursor resultados = bd.rawQuery(" select "+Usuario.id_primaryKey_0+
+										" from "+Usuario.nombreTabla+
+										" where "+Usuario.nombre_str_1+" = '"+nombre+"' ", null);
+		int id=0;
+		if (resultados.getCount()>0) 
+		{
+			while(resultados.moveToNext())
+			{
+				id=Integer.parseInt(resultados.getString(0));
+			}
+			bd.close();		
+			resultados.close();
+
+			return id;
+		}
+		bd.close();
+		resultados.close();
+		return -1;
+	}
+	public int getIdUsuarioLoggeado()
+	{
+		Log.d("***getIdUsuarioLoggeado",getClass().toString());
+		AdminSQLiteOpenHelper admin = new AdminSQLiteOpenHelper(context,null, 1);
+		SQLiteDatabase bd = admin.getReadableDatabase();
+		String query=" select "+Usuario.id_primaryKey_0+
+				" from "+Usuario.nombreTabla+
+				" where "+Usuario.loggeado_int_10+" = 1";
+		Log.d("Usuarios loggeados",this.getConsultaToString(" select "+Usuario.id_primaryKey_0+
+																" from "+Usuario.nombreTabla+
+																" where "+Usuario.loggeado_int_10+"= 1 "));
+		Cursor resultados = bd.rawQuery(query, null);
+		Log.d("**pase cursor","pase");
+		int res=-1;
+		if (resultados.getCount()>0) 
+		{
+			while(resultados.moveToNext())
+			{
+			Log.d("getIdUsuarioLoggeado es =",resultados.getString(0));
+			res=Integer.parseInt(resultados.getString(0));
+			}
+		}
+		bd.close();
+		resultados.close();
+		Log.d("getIdUsuarioLoggeado",res+"");
+		return res;
 	}
 	public String getConsultaToString(String query)
 	{

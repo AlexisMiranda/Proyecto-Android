@@ -158,7 +158,15 @@ public class MaquinaEjercicioActivity extends Activity {
 	{
 		LinearLayout l1=new LinearLayout(this);
 		l1.setOrientation(LinearLayout.VERTICAL);
-		l1.addView(crearTitulo(R.drawable.titulo_seleccion_de_maquinas,150,80,50,10,50,0));
+		l1.addView(desloggear());
+		TextView titulo=new TextView(this);
+		titulo.setText("Selecciona Ejercicios");
+		LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		lp.setMargins(30, 5, 5, 5);
+		titulo.setLayoutParams(lp);
+		titulo.setTextColor(Color.parseColor("#210B61"));
+		titulo.setTextSize(25);
+		l1.addView(titulo);
 		l1.addView(crearImageView(tabla_maquina.getImagen(id_maquina, this),200,200,40,0,40,5));
 		l1.addView(crearLayout(id_maquina));
 		l1.addView(crearBoton());
@@ -469,14 +477,14 @@ public class MaquinaEjercicioActivity extends Activity {
 		/*	Por cada ejercicio seleccionado inserto los parametros del ejercicio como peso,repeticiones y
 			los dias seleccionados para realizar esos ejercicios
 		*/
-		
+		int id_usuario_loggeado=usuario.getIdUsuarioLoggeado();
 		Iterator<Integer> ejercicios= dias_selec_por_ejer.keySet().iterator();
 		while(ejercicios.hasNext())
 		{
 			int id_ejercicio=ejercicios.next();
 			for(String dia:dias_selec_por_ejer.get(id_ejercicio))
 			{
-				tabla_tipoEjercicio_usuario.crearTipoEjercicioUsuario(0, id_ejercicio, 1,dia);
+				tabla_tipoEjercicio_usuario.crearTipoEjercicioUsuario(0, id_ejercicio, id_usuario_loggeado,dia);
 				ArrayList<String> array_param=param_ingre_por_ejer.get(id_ejercicio);
 				int id_tipo_ejercicio_usuario=tabla_tipoEjercicio_usuario.getUltimoIdInsertado();
 				for(int ind=0;ind<array_param.size();ind++)
@@ -500,6 +508,7 @@ public void eliminarDatosEnBd(int id_maquina)
  *  ejercicio.
 
  */
+	int id_usuario_loggeado=usuario.getIdUsuarioLoggeado();
 	Log.d(this.getClass().toString(),"eliminarDatosEnBd(int id_maquina)");
 	ArrayList<Integer> ids_tipo_ejercicios=this.ejercicios_seleccionados_por_maquina.get(id_maquina);
 	for(int id_tipo_ejer:ids_tipo_ejercicios)
@@ -509,7 +518,7 @@ public void eliminarDatosEnBd(int id_maquina)
 		{
 			tabla_requerimiento_ejercicio.eliminarReqEjerPorTipoEjerUser(id_tipo_ejer_user);
 		}
-		tabla_tipoEjercicio_usuario.eliminarTipoEjerUsuarioPorTipoEjer(id_tipo_ejer);
+		tabla_tipoEjercicio_usuario.eliminarTipoEjerUsuarioPorTipoEjer(id_tipo_ejer,id_usuario_loggeado);
 	}
 }
 	public EditText crearEditText(int id,String texto,int w,int h,int left,int top,int right,int bottom)
@@ -526,6 +535,36 @@ public void eliminarDatosEnBd(int id_maquina)
 		return edit;
 	}
 
-	
+	public TextView desloggear()
+	{
+		TextView text=new TextView(this);
+		Usuario u=new Usuario(this);
+		int id_usuario_loggeado=u.getIdUsuarioLoggeado();
+		String nombre=u.getNombre(id_usuario_loggeado);
+		text.setText(nombre.substring(0,1).toUpperCase()+nombre.substring(1)+"\tX Cerrar Sesion");
+		LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT);
+		lp.setMargins(100, 5, 0, 5);
+		text.setLayoutParams(lp);
+		text.setTextSize(18);
+		text.setTextColor(Color.parseColor("#DF0101"));
+		text.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				//elimino todas las maquinas seleccionadas
+				for(int ids:ids_maquinas_seleccionadas)
+				{
+				eliminarDatosEnBd(ids);
+				}
+				//lo envio a login activity
+				Toast.makeText(getApplicationContext(),"Usuario desloggeado",Toast.LENGTH_SHORT).show();
+				Intent i=new Intent(getApplicationContext(), LoginActivity.class);
+				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(i);
+			}
+		});
+		return text;
+		
+	}
 }
 

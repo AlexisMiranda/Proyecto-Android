@@ -49,7 +49,7 @@ public class FormularioUsuarioActivity extends Activity {
 	private HashMap<String, String> hash_columnas=new HashMap<String, String>();	
 	private HashMap<String, EditText> edit_text_hash=new HashMap<String, EditText>();
 	private int sexo, edad;
-	private String nombre;
+	private String nombre,passwd;
 	private float  estatura, peso;
 	private RadioButton hombre,mujer;
 	private ImageView titulo;
@@ -79,6 +79,7 @@ public class FormularioUsuarioActivity extends Activity {
 		hash_columnas.remove(Usuario.id_primaryKey_0);
 		hash_columnas.remove(Usuario.imc_float_8);
 		hash_columnas.remove(Usuario.puntaje_float_7);
+		hash_columnas.remove(Usuario.loggeado_int_10);
 		
 		Iterator<String> key_columnas=hash_columnas.keySet().iterator();
 		int cnt_edit=hash_columnas.size(),i=0;
@@ -138,25 +139,13 @@ public class FormularioUsuarioActivity extends Activity {
             {
             	if(validadores())
             	{
-        			Log.d("Pase validadores","CRE");
-
-            		if(usuario.existeUsuario(1))//si existe lo edito
-            		{
-            			Log.d("edito USUARIO","CRE");
-            			ContentValues valores_columnas=new ContentValues();
-            			valores_columnas.put(Usuario.nombre_str_1,nombre);
-            			valores_columnas.put(Usuario.edad_int_3,edad);
-            			valores_columnas.put(Usuario.estatura_float_4,estatura);
-            			valores_columnas.put(Usuario.peso_float_6,peso);
-            			valores_columnas.put(Usuario.sexo_int_5,sexo); 
-            			valores_columnas.put(Usuario.imc_float_8, peso/(estatura*estatura));
-            			Log.d("Usuario actualizado",""+valores_columnas.toString());
-            		usuario.editarUsuario(1, valores_columnas);
-            		}else{//si no existe lo creo
             			Log.d("CREO USUARIO","CRE");
-            			usuario.crearUsuario(1, nombre,edad, estatura, peso, sexo);
-            		}
-            		Intent intent =new Intent(getApplicationContext(),SeleccionarMaquinaActivity.class);
+            			usuario.crearUsuario(0, nombre,passwd,edad, estatura, peso, sexo);
+            			Log.d("tabla de usuarios",usuario.getConsultaToString("select * from "+Usuario.nombreTabla));
+            		
+            		Toast.makeText(getApplicationContext(), "Usuario Creado", Toast.LENGTH_SHORT).show();
+            		Intent intent =new Intent(getApplicationContext(),LoginActivity.class);
+            		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             		startActivity(intent);
             	}
             }
@@ -173,6 +162,7 @@ public class FormularioUsuarioActivity extends Activity {
 		HashMap<String, String> hash_columnas2= hash_columnas;
 		hash_columnas2.remove("sexo");//viene por defecto con 0
 		hash_columnas2.remove("rutina");
+		hash_columnas2.remove(Usuario.loggeado_int_10);
 		Iterator<String> key_columnas=hash_columnas2.keySet().iterator();
 		while(key_columnas.hasNext())
 		{
@@ -192,6 +182,14 @@ public class FormularioUsuarioActivity extends Activity {
 
 		Log.d("Nombre= ",""+this.edit_text_hash.get("nombre").getText().toString());
     	this.nombre=this.edit_text_hash.get("nombre").getText().toString();
+    	Log.d("passwd= ",""+this.edit_text_hash.get("nombre").getText().toString());
+    	this.passwd=this.edit_text_hash.get(Usuario.passwd_str_2).getText().toString();
+    	if(usuario.getIdUsuario(nombre)!=-1)
+    	{
+			Toast.makeText(this, "Usuario ya existe en el sistema",Toast.LENGTH_SHORT).show();
+
+    		return false;
+    	}
     	Log.d("edad= ",""+this.edit_text_hash.get("edad").getText().toString());
     	this.edad=Integer.parseInt(this.edit_text_hash.get("edad").getText().toString());
     	Log.d("estatura= ",""+this.edit_text_hash.get("estatura").getText().toString());

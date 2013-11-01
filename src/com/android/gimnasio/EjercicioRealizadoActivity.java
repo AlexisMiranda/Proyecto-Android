@@ -6,8 +6,11 @@ import com.android.gimnasio.api.Maquina;
 import com.android.gimnasio.api.RequerimientoEjercicio;
 import com.android.gimnasio.api.TipoEjercicio;
 import com.android.gimnasio.api.TipoEjercicioUsuario;
+import com.android.gimnasio.api.Usuario;
 
 import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
@@ -30,17 +34,19 @@ public class EjercicioRealizadoActivity extends Activity {
 	
 	private LinearLayout linear;//,linear2;
 	private Button boton;
-	private int numero_de_maquinas,num_maquina_selec;
+	private int numero_de_maquinas,num_maquina_selec,id_usuario_loggeado;
 	private String dia;
 	private Maquina tabla_maquina;
 	private TipoEjercicioUsuario tabla_teu;
 	private TipoEjercicio tabla_te;
 	private RequerimientoEjercicio tabla_rqe;
 	private ArrayList<Integer> ejercicios_por_maquina_Selec;
+	private Usuario usuario;
 	
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		Log.d("++Entro en ",getClass().toString());
 		num_maquina_selec=Integer.parseInt(getIntent().getStringExtra("num_maquina_selec"));
 		dia=getIntent().getStringExtra("dia");
 		setContentView(R.layout.activity_ejercicio_realizado);
@@ -48,9 +54,11 @@ public class EjercicioRealizadoActivity extends Activity {
 		tabla_teu=new TipoEjercicioUsuario(this);
 		tabla_te=new TipoEjercicio(this);
 		tabla_rqe=new RequerimientoEjercicio(this);
-	
+		usuario=new Usuario(this);
+		id_usuario_loggeado=usuario.getIdUsuarioLoggeado();
 		ejercicios_por_maquina_Selec=tabla_teu.getEjerciciosSeleccionados(num_maquina_selec,dia.substring(0, 3));
 		linear=(LinearLayout)findViewById(R.id.linear);
+		linear.addView(desloggear());
 		TextView titulo=new TextView(this);
 		titulo.setText("\n\n\tReporte Para el dia "+dia);
 		titulo.setTextColor(Color.parseColor("#0B0B61"));
@@ -71,15 +79,24 @@ public class EjercicioRealizadoActivity extends Activity {
 		b.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		b.setText("Puntaje");
 		b.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
-
 				calcularPuntaje();
 			}
 		});
 		linear.addView(b);
-		calcularPuntaje();
+		Button b_comparar_usuarios=new Button(this);
+		b_comparar_usuarios.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		b_comparar_usuarios.setText("Ranking de usuarios");
+		b_comparar_usuarios.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d("entre en en","b_comparar_usuarios");
+				Intent i=new Intent(getApplicationContext(),rankingDeUsuariosActivity.class);
+				startActivity(i);
+			}
+		});
+		linear.addView(b_comparar_usuarios);
 
 	}
 
@@ -90,17 +107,17 @@ public class EjercicioRealizadoActivity extends Activity {
 
 		linear_vertical.setOrientation(LinearLayout.VERTICAL);
 		linear_vertical.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-		//-------------------------------------------------------------------------------------
 		LinearLayout linear_horizontal1=new LinearLayout(this);
 		linear_horizontal1.setOrientation(LinearLayout.HORIZONTAL);
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		lp.setMargins(110, 10, 2, 5);
 		linear_horizontal1.setLayoutParams(lp);
-		ArrayList<String> params_ejercicios=tabla_rqe.getNombres(tabla_teu.getIdTipoEjercicioUsuario(ejercicios_por_maquina_Selec.get(0), 1, dia.substring(0,3)));
+		ArrayList<String> params_ejercicios=tabla_rqe.getNombres(tabla_teu.getIdTipoEjercicioUsuario(ejercicios_por_maquina_Selec.get(0), id_usuario_loggeado, dia.substring(0,3)));
 		for(int col=0;col<params_ejercicios.size();col++)
 		{
 		         TextView t2= new TextView(this);//crearTextViewMathParent("param_"+params_ejercicios.get(col),params_ejercicios.get(col),1, 5, 2, 2);
 			    t2.setText(params_ejercicios.get(col)+" ");
+			    t2.setTag(params_ejercicios.get(col));
 		         linear_horizontal1.addView(t2);
 		}
 		
@@ -119,13 +136,15 @@ public class EjercicioRealizadoActivity extends Activity {
 			{
 
 						TextView txt=crearTextView("text"+contedit,"", 19,20,0, 2, 0, 2);
-						//TextView txt=new TextView(this);
-						txt.setText(""+tabla_rqe.getValor(tabla_teu.getIdTipoEjercicioUsuario(ejercicios_por_maquina_Selec.get(fila), 1, dia.substring(0, 3)), params_ejercicios.get(col)));
-						//txt.setTag("text"+contedit);
-						//txt.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-						EditText edit=crearEditText(40,40,1, 2, 0, 2);
-						/*edit.setOnKeyListener(new View.OnKeyListener() {
-						});*/
+						txt.setText(""+tabla_rqe.getValor(tabla_teu.getIdTipoEjercicioUsuario(ejercicios_por_maquina_Selec.get(fila), id_usuario_loggeado, dia.substring(0, 3)), params_ejercicios.get(col)));
+						int id_ejercicio=ejercicios_por_maquina_Selec.get(fila);
+						int id_tipo_ejercicio_usuario=tabla_teu.getIdTipoEjercicioUsuario(id_ejercicio, id_usuario_loggeado, dia.substring(0,3));
+						int valor=Integer.parseInt(tabla_rqe.getValorNew(id_tipo_ejercicio_usuario, params_ejercicios.get(col)));
+						Log.d("id_ejercicio",id_ejercicio+"");
+						Log.d("id_tipo_ejercicio_usuario",id_tipo_ejercicio_usuario+"");
+						Log.d("valor",valor+"");
+
+						EditText edit=crearEditText(valor,40,40,1, 2, 0, 2);
 
 						edit.setTag("edit"+contedit);
 						contedit++;
@@ -196,61 +215,76 @@ public class EjercicioRealizadoActivity extends Activity {
 	}
 	public void calcularPuntaje()
 	{
-		int actual=0,anterior=0;
+		ArrayList<String> params_ejercicios=tabla_rqe.getNombres(tabla_teu.getIdTipoEjercicioUsuario(ejercicios_por_maquina_Selec.get(0), id_usuario_loggeado, dia.substring(0,3)));
+		int actual=0,anterior=0,cnt_ejercicio=0,cnt_param=0,num_edit=0;
+		double puntaje_por_ejercicio=0;
 		int acumulador=0;
         double porciento;
-		for(int num_edit=0;num_edit<(3*ejercicios_por_maquina_Selec.size());num_edit++)
-		{      
-			Log.d("indice",""+num_edit);
-			TextView por =(TextView)linear.findViewWithTag("porcentaje"+(num_edit));
-			EditText edit=(EditText)linear.findViewWithTag("edit"+num_edit);
-			TextView rsp =(TextView)linear.findViewWithTag("text"+(num_edit));
-	        Log.d("edit",edit.getText().toString());
-	        actual=Integer.parseInt(edit.getText().toString());
-			Log.d("text",rsp.getText().toString());
-			anterior=Integer.parseInt(rsp.getText().toString());
-			 /*
-			  * anterior 100
-			  * actual   x
-			  */
-			 if(actual!=0){
-				 porciento=Math.abs((100*actual))/anterior;
-			 }else{
-				 porciento=0;
-			 }
-			 Log.d("pociento",porciento+"");
-			 por.setText(" "+porciento+"%  ");
-			 acumulador= (int) (porciento+acumulador);					
+		for(int fila=0;fila<ejercicios_por_maquina_Selec.size();fila++)
+		{
+
+			
+			for(int col=0;col<params_ejercicios.size();col++)
+			{
+				TextView por =(TextView)linear.findViewWithTag("porcentaje"+(num_edit));
+				EditText edit=(EditText)linear.findViewWithTag("edit"+num_edit);
+				TextView rsp =(TextView)linear.findViewWithTag("text"+(num_edit));
+				num_edit+=1;
+				Log.d("edit",edit.getText().toString());
+		        actual=Integer.parseInt(edit.getText().toString());
+				Log.d("text",rsp.getText().toString());
+				anterior=Integer.parseInt(rsp.getText().toString());
+		
+				 if(actual!=0){
+					 porciento=Math.abs((100*actual))/anterior;
+				 }else{
+					 porciento=0;
+				 }
+				 Log.d("pociento",porciento+"");
+				 por.setText(" "+porciento+"%  ");
+				 acumulador= (int) (porciento+acumulador);	
+				 puntaje_por_ejercicio=puntaje_por_ejercicio+porciento;
+				 int id_tipo_ejercicio_usuario=tabla_teu.getIdTipoEjercicioUsuario(ejercicios_por_maquina_Selec.get(fila), id_usuario_loggeado, dia.substring(0,3));
+				 int id_requerimiento_ejercicio=tabla_rqe.getIdRequerimientoEjercicio(id_tipo_ejercicio_usuario,params_ejercicios.get(col));
+				 ContentValues colum=new ContentValues();
+				 Log.d("++edit text value",edit.getText().toString());
+				 colum.put(RequerimientoEjercicio.valornew_str_4, edit.getText().toString());
+				 colum.put(RequerimientoEjercicio.puntaje_float_5, porciento);
+				 Log.d("id_tipo_ejercicio_usuario",""+id_tipo_ejercicio_usuario);
+				 Log.d("id_requerimiento_ejercicio",""+id_requerimiento_ejercicio);
+
+				 tabla_rqe.editarRequerimiento(id_requerimiento_ejercicio, colum);
+				 Log.d("tabla TipoEjercicioUsuario",tabla_teu.getConsultaToString("select * from "+TipoEjercicioUsuario.nombreTabla));
+				  Log.d("tabla Requerimiento",tabla_teu.getConsultaToString("select * from "+RequerimientoEjercicio.nombreTabla));
+			}
+			
 		}
-		acumulador=acumulador/(3*ejercicios_por_maquina_Selec.size());
-		TextView acumul =(TextView)linear.findViewWithTag("acumulador");
-		acumul.setText("   progreso="+acumulador+"% ");
+
 		
 	}
-	/*
-	public boolean eventoKeyEditText()
+	public boolean es_multiplo(int a,int b)
 	{
-		Log.d("hijo ",linear.toString());
-		int promedio=0;
-		for(int num_edit=1;num_edit<5;num_edit++)
+		/*
+		 * a es multiplo de b
+		 * ej: 6 multiplo de 3 =true
+		 * 		5 multiplo de 3=false
+		 */
+		Log.d("es_multiplo",a+" "+b);
+		boolean es_mul=false;
+		for(int i=1;i<=a;i++)
 		{
-			EditText edit=(EditText)linear.findViewWithTag("edit"+num_edit);
-			Log.d("edit",edit.getText().toString());
-			TextView text=(TextView)linear.findViewWithTag("text"+num_edit);
-			Log.d("texto ",""+text.getText());
-			int valor_edit=0;
-			if(edit.getTag().toString().contains(""))
-				valor_edit=1;
-			else
-				valor_edit=Integer.parseInt(edit.getText().toString());
-			int res1=(Integer.parseInt(""+text.getText()));
-			promedio+=Math.abs((res1/valor_edit))*100;
-			Log.d("edit "+edit.getTag()+" valor edit = "+valor_edit,"promedio "+promedio);	
-					
+			if((b*i)==a)
+			{
+				es_mul=true;
+				Log.d("si es multiplo",a+" "+b);
+				break;
+			}
 		}
-		Log.d("puntaje total= ",""+(promedio));
-		return true;
-	}*/
+		return es_mul;
+	}
+	
+	
+	
 	private TextView crearTextView(String tag,String texto,int w,int h,int left,int top,int right,int bottom) {
 		
 		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, w, getResources().getDisplayMetrics());
@@ -289,7 +323,7 @@ public class EjercicioRealizadoActivity extends Activity {
 		img.setImageResource(resdid);
 		return img;
 	}
-	public EditText crearEditText(int w,int h,int left,int top,int right,int bottom)
+	public EditText crearEditText(int valor,int w,int h,int left,int top,int right,int bottom)
 	{
 		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, w, getResources().getDisplayMetrics());
 		int heigth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, h, getResources().getDisplayMetrics());
@@ -299,10 +333,35 @@ public class EjercicioRealizadoActivity extends Activity {
 		edit.setLayoutParams(lp);
 		edit.setInputType(InputType.TYPE_CLASS_NUMBER);
 		edit.setFilters(new InputFilter[] {new InputFilter.LengthFilter(5)});
-		edit.setText("0");
+		edit.setText(""+valor);
 		return edit;
 	}
-	
+	public TextView desloggear()
+	{
+		TextView text=new TextView(this);
+		Usuario u=new Usuario(this);
+		int id_usuario_loggeado=u.getIdUsuarioLoggeado();
+		String nombre=u.getNombre(id_usuario_loggeado);
+		text.setText(nombre.substring(0,1).toUpperCase()+nombre.substring(1)+"\tX Cerrar Sesion");
+		LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT);
+		lp.setMargins(100, 5, 0, 5);
+		text.setLayoutParams(lp);
+		text.setTextSize(18);
+		text.setTextColor(Color.parseColor("#DF0101"));
+		text.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				//lo envio a login activity
+				Toast.makeText(getApplicationContext(),"Usuario desloggeado",Toast.LENGTH_SHORT).show();
+				Intent i=new Intent(getApplicationContext(), LoginActivity.class);
+				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(i);
+			}
+		});
+		return text;
+		
+	}
 	
 	public boolean onCreateOptions(Menu menu)
 	{

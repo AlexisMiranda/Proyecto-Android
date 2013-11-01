@@ -36,6 +36,13 @@
             android:screenOrientation="portrait"
             
             />
+      <activity 
+            android:name="com.android.gimnasio.LoginActivity"
+            android:label="LoginActivity"
+            android:screenOrientation="portrait"
+            
+            />
+        
         
          <activity 
             android:name="com.android.gimnasio.maquinasPorDia.MaquinasPorDiaActivity"
@@ -69,6 +76,12 @@
             android:label="EjercicioRealizadoActivity"
             android:screenOrientation="portrait"
             />
+     <activity 
+            android:name="com.android.gimnasio.rankingDeUsuariosActivity"
+            android:label="RankingDeUsuariosActivity"
+            android:screenOrientation="portrait"
+            />
+     
     </application>
 
 </manifest>

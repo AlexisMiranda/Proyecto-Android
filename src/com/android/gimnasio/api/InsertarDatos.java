@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class InsertarDatos {
 
-	
+	public static int num_maquinas=9;
 	public static void setDeDatos(Context context, int version)
 	{
 		AdminSQLiteOpenHelper admin=new AdminSQLiteOpenHelper(context, null, version);

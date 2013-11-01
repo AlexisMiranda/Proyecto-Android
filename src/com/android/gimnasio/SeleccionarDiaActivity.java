@@ -43,6 +43,7 @@ public class SeleccionarDiaActivity extends ListActivity {
 	private RequerimientoEjercicio tabla_requerimiento_ejer;
 	private LinearLayout linear;
 	private String ultima_maquina_seleccionada;
+	private int id_usuario_loggeado;
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,15 +54,18 @@ public class SeleccionarDiaActivity extends ListActivity {
 		tabla_requerimiento_ejer=new RequerimientoEjercicio(this);
 		linear=(LinearLayout)findViewById(R.id.linear);
 		Log.d("entro en actividad",getApplication().toString());
+		id_usuario_loggeado=usuario.getIdUsuarioLoggeado();
 		ultima_maquina_seleccionada=getIntent().getStringExtra("ultima_maquina_seleccionada");
 		Log.d("ultima_maquina_seleccionada",""+ultima_maquina_seleccionada);
-		dias=getDiasOrdenados(ejercicio_usuario.getDiasInsertados());
+		dias=getDiasOrdenados(ejercicio_usuario.getDiasInsertados(id_usuario_loggeado));
 		
 		Log.d("dias res",dias.toString());
+		Log.d("tabla Usuarios",usuario.getConsultaToString("select * from "+Usuario.nombreTabla));
 	setTheme(CONTEXT_INCLUDE_CODE);
 		
 	setListAdapter(new ArrayAdapter<String>(this, R.layout.activity_seleccionar_dia, android.R.id.text1, dias));
-	if(ultima_maquina_seleccionada!=null || (usuario.getTieneRutinaCreada(1)==false) )
+	Log.d("usuario con rutina"+id_usuario_loggeado,""+usuario.getTieneRutinaCreada(id_usuario_loggeado));
+	if(ultima_maquina_seleccionada!=null || (!usuario.getTieneRutinaCreada(id_usuario_loggeado)) )
 	{
 		validarRutinaDeEjercicios();
 	}
@@ -70,13 +74,14 @@ public class SeleccionarDiaActivity extends ListActivity {
 	public void onBackPressed() 
 	{
 		Log.d("usuario= rutina",""+usuario.getTieneRutinaCreada(1));
-		if(!usuario.getTieneRutinaCreada(1))
+
+		if(!usuario.getTieneRutinaCreada(id_usuario_loggeado))
 		{
 			if(ultima_maquina_seleccionada!=null )
 			{
 				ContentValues columnas=new ContentValues();
 				columnas.put(Usuario.rutina_int_9,0);
-				usuario.editarUsuario(1, columnas);
+				usuario.editarUsuario(id_usuario_loggeado, columnas);
 				if(Integer.parseInt(ultima_maquina_seleccionada)!=-1)
 				{
 					ArrayList<Integer> ejercicios=tipo_ejercicio.getIdsTipoEjercicios(Integer.parseInt(ultima_maquina_seleccionada));
@@ -92,7 +97,7 @@ public class SeleccionarDiaActivity extends ListActivity {
 							tabla_requerimiento_ejer.eliminarReqEjerPorTipoEjerUser(id_tipo_ejer_user);
 							Log.d("eliminando = ","id tipo ejercicio = "+id_tipo_ejer_user);
 						}
-						ejercicio_usuario.eliminarTipoEjerUsuarioPorTipoEjer(id_tipo_ejer);
+						ejercicio_usuario.eliminarTipoEjerUsuarioPorTipoEjer(id_tipo_ejer,id_usuario_loggeado);
 						Log.d("eliminando = ","id tipo ejercicio usuario = "+id_tipo_ejer);
 					}
 				}
@@ -140,7 +145,7 @@ public class SeleccionarDiaActivity extends ListActivity {
 					{ 
 					ContentValues columnas=new ContentValues();
 					columnas.put(Usuario.rutina_int_9,1);
-					usuario.editarUsuario(1, columnas);
+					usuario.editarUsuario(id_usuario_loggeado, columnas);
 					dialog.cancel();
 					}else{
 						onBackPressed();
