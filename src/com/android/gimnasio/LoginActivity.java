@@ -37,17 +37,18 @@ public class LoginActivity extends Activity {
 		edit_passwd=new EditText(this);
 		usuario=new Usuario(this);
 		linear=(LinearLayout)findViewById(R.id.linear_logn);
-		titulo=crearTextView(1, "Loggin",33,70, 10, 10,10);
+		titulo=crearTextView(1, "Registrate",33,70, 10, 10,10);
 		text_user=crearTextView(2, "Ingresa tu Usuario :",22,20, 0, 0,0);
-		text_passwd=crearTextView(3, "Ingresa tu password :",22, 20, 0, 0,0);
+		text_passwd=crearTextView(3, "Ingresa tu contraseña :",22, 20, 0, 0,0);
 		edit_user=crearEditText(4, "user", 300, 50, 5, 10, 30,0);
 		edit_passwd=crearEditText(5,"passwd", 300, 50, 5, 10, 30,10);
 		text_crear_usuario=crearTextView(6, "Crea un usuario en el sistema >>", 15, 20, 0, 5, 10);
-		text_crear_usuario.setTextColor(Color.GREEN);
+		text_crear_usuario.setTextColor(Color.RED);
 		text_crear_usuario.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent i=new Intent(getApplicationContext(),FormularioUsuarioActivity.class);
+				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(i);
 			}
 		});
@@ -72,6 +73,7 @@ public class LoginActivity extends Activity {
 					columnas.put(Usuario.loggeado_int_10,1);
 					usuario.editarUsuario(usuario.getIdUsuario(user.getText().toString(), passwd.getText().toString()), columnas);
 					Intent i=new Intent(getApplicationContext(),SeleccionarDiaActivity.class);
+					i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(i);
 				}else{
 					ContentValues columnas=new ContentValues();
@@ -79,6 +81,7 @@ public class LoginActivity extends Activity {
 					usuario.editarUsuario(usuario.getIdUsuario(user.getText().toString(), passwd.getText().toString()), columnas);
 					Log.d("tabla usuario",usuario.getConsultaToString("select * from "+Usuario.nombreTabla));
 					Intent i=new Intent(getApplicationContext(),SeleccionarMaquinaActivity.class);
+					i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(i);
 				}
 				
@@ -91,6 +94,14 @@ public class LoginActivity extends Activity {
 		linear.addView(edit_passwd);
 		linear.addView(text_crear_usuario);
 		linear.addView(ingresar);
+	}
+	public void onBackPressed()
+	{
+		Intent i=new Intent(getApplicationContext(),HomeActivity.class);
+		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(i);
+		finish();
+		
 	}
 	public void onStart()
 	{
