@@ -42,13 +42,10 @@ import android.widget.Toast;
 public class SeleccionarMaquinaActivity extends Activity{
 
 	private Maquina maquina;
-	private Usuario usuario;
-	private TipoEjercicio te;
 	private TextView titulo;
-	private ArrayList<Integer> ids,idste,ids2;
+	private ArrayList<Integer> ids_maquinas,ids_maquinas_seleccionadas;
 	private LinearLayout l1;
-	private ImageView img;
-	private int num_row=0,width,heigth;
+	private int num_row=0;
 	private Button siguiente;
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -56,164 +53,126 @@ public class SeleccionarMaquinaActivity extends Activity{
 		setContentView(R.layout.activity_seleccionar_maquina);
 		l1=(LinearLayout)findViewById(R.id.linear);
 		maquina=new Maquina(this);
-		usuario=new Usuario(this);
-		ids=maquina.getIdsMaquinas();
+		ids_maquinas=maquina.getIdsMaquinas();
 		titulo=new TextView(this);
 		siguiente=new Button(this);
 		siguiente.setLayoutParams(new LinearLayout.LayoutParams(
 				ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.MATCH_PARENT));
 		siguiente.setText("Seleccionar Tipo Ejercicio");
+		ids_maquinas_seleccionadas=new ArrayList<Integer>();
 		siguiente.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				Intent i=new Intent(getApplicationContext(), MaquinaEjercicioActivity.class);
-				startActivity(i);
+				//si no selecciona maquinas no pasa a la siguiente actividad y envia un mensaje
+				if(ids_maquinas_seleccionadas.size()!=0)
+				{
+					Intent i=new Intent(getApplicationContext(), MaquinaEjercicioActivity.class);
+					i.putIntegerArrayListExtra("ids_maquinas_seleccionadas", ids_maquinas_seleccionadas);
+					startActivity(i);
+				}else{
+					Toast.makeText(getApplicationContext(), "Seleccione alguna maquina", Toast.LENGTH_LONG).show();
+
+				}
 				
 			}
 		});
-		width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160, getResources().getDisplayMetrics());
-		heigth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 120, getResources().getDisplayMetrics());
-		int num_filas=ids.size()/2;
-		int resto=ids.size()%2;
-		int cnt=0,num_maquina=0,num_linear,i=0;
+		
+		//si el numero de elementos de la lista es impar,entonces num_filas teendra numero par
+		int num_filas=(ids_maquinas.size()%2==1)?ids_maquinas.size()-1:ids_maquinas.size();
+		int resto=ids_maquinas.size()%2;
 		this.llenar_encabezado();
-		
-	for(int fila=0;fila<num_filas;fila++)
-		{
-			num_linear=1;
-			if(fila%2==0)
-			{
-			num_linear=0;
-			}
-				
-			LinearLayout l2=new LinearLayout(this);
-			l2.setOrientation(LinearLayout.HORIZONTAL);
-			l2.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-			for(int columna=0;columna<2;columna++)
-			  	{    
-					Log.d(""+columna,""+maquina.getNombre(ids.get(num_maquina)));
-					switch (num_linear) 
-					{
-			    		case 0:
-			    			l2.addView(this.crearCheckbox(num_maquina));
-						break;
-			    		case 1:
-							l2.addView(this.crear_ImageView(num_maquina));
-						break;
-			    		default:
-						break;
-					}
-				    num_maquina+=1;
-
-				}
-			l1.addView(l2,num_row);
-			 num_row+=1;
-		}
-	l1.addView(siguiente,num_row);
-	}
-		
-	
-	public ImageView crear_ImageView(int num_maquina)
-	{
-		ImageView addBtn = new ImageView(this);
-		
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, heigth);
-        addBtn.setLayoutParams(layoutParams);
-		addBtn.setImageBitmap(maquina.getImagen(ids.get(num_maquina), this));
-		return addBtn;
-	}
-		
-	public CheckBox crearCheckbox(int num_maquina)
-	{
-		CheckBox checkBox = new CheckBox(this);
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, heigth);
-        checkBox.setLayoutParams(layoutParams);
-		checkBox.setGravity(Gravity.CENTER);
-		checkBox.setText(maquina.getNombre(ids.get(num_maquina)));
-		checkBox.setTextSize(10);
-		checkBox.setId(ids.get(num_maquina));
-		
-		checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() 
-		{
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) 
-			{
-			       if (buttonView.isChecked()) 
-			       {
-                         Toast.makeText(getBaseContext(),  "checkeado "+buttonView.getId(),Toast.LENGTH_SHORT).show();
-                   }						
-			}
-          });
-		return checkBox;
-	}
-	
-		
-
-	 /*  
+		int indice_che=0;
+		int indice_img=0;
+		Log.d("ids",""+ids_maquinas.toString());
 		for (int fila = 0; fila <num_filas; fila++) 
-		{
-			 LinearLayout l2=new LinearLayout(this);
-			    l2.setOrientation(LinearLayout.HORIZONTAL);
-			    l2.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-			    l2.addView(new TextView(this));
-			  
-		     for(int col=0;col<2;col++)
-		     {
-				CheckBox checkBox = new CheckBox(this);
-				checkBox.setGravity(Gravity.CENTER);
-				 checkBox.setId(ids.get(i));
-				 checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			{
+			Log.d("fila= ",fila+"");
+					LinearLayout l2=crearLinearLayout();
+					for(int col=0;col<2;col++)//2 maquinas por fila
+					{
+						switch ((fila%2)) {
+						case 0:
+							Log.d("checkbox= "+indice_che,(fila%2)+"");
 
+								l2.addView(this.crearCheckBox(indice_che));
+								indice_che+=1;
+							
+							break;
+						case 1:
+							Log.d("image= "+indice_img,(fila%2)+"");
 
-						@Override
-						public void onCheckedChanged(CompoundButton buttonView,
-								boolean isChecked) {
-						       if (buttonView.isChecked()) {
-		                             Toast.makeText(getBaseContext(),  "checkeado "+buttonView.getId(),Toast.LENGTH_SHORT).show();
-		                          }						
-						}
-	                  });
-				l2.addView(checkBox);
-		        ImageView addBtn = new ImageView(this);
-		       LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, 300);
-		        addBtn.setLayoutParams(layoutParams);
-		        addBtn.setImageBitmap(maquina.getImagen(ids.get(i), this));
-		        i+=1;
-		        l2.addView(addBtn);
+								l2.addView(this.crearImageView(indice_img));
+								indice_img+=1;
+								break;
+						}	 
+				    	
+					}
+					
+					 l1.addView(l2,num_row);
+					 num_row+=1;
 			}
+		if(resto==1)
+		{
+			LinearLayout l2=crearLinearLayout();
+			l2.addView(this.crearCheckBox(indice_che));
+			LinearLayout l3=crearLinearLayout();
+			l3.addView(this.crearImageView(indice_img));
 			 l1.addView(l2,num_row);
 			 num_row+=1;
+			 l1.addView(l3,num_row);
+			 num_row+=1;
 		}
-		LinearLayout l2=new LinearLayout(this);
-	    l2.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-
-	    l2.setOrientation(LinearLayout.HORIZONTAL);
-	    l2.addView(new TextView(this));
-
-		for (int col = 0; col <resto; col++) {
-			CheckBox checkBox = new CheckBox(this);
-	        ImageView addBtn = new ImageView(this);
-	        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, 300);
-	        addBtn.setLayoutParams(layoutParams);
-	        addBtn.setImageBitmap(maquina.getImagen(ids.get(i), this));
-	        i+=1;
-			l2.addView(checkBox);
-	        l2.addView(addBtn);
-			
-		}
-		 l1.addView(l2,num_row);
-		 num_row+=1;
 		 l1.addView(new TextView(this),num_row);
 		 num_row+=1;
 		 l1.addView(siguiente,num_row);
 		 num_row+=1;
-*/
+	}
 	
-
-	
+	public LinearLayout crearLinearLayout()
+	{
+		LinearLayout l2=new LinearLayout(this);
+	    l2.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+	    l2.setOrientation(LinearLayout.HORIZONTAL);
+	    return l2;
+	}
+	public CheckBox crearCheckBox(int indice_maquina)
+	{
+	int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 140, getResources().getDisplayMetrics());
+	int	heigth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics());
+	CheckBox checkBox = new CheckBox(this);
+	//checkBox.setGravity(Gravity.CENTER);
+	checkBox.setId(ids_maquinas.get(indice_maquina));
+	checkBox.setText(maquina.getNombre(ids_maquinas.get(indice_maquina)));
+	checkBox.setTextSize(10);
+	checkBox.setTextColor(Color.GRAY);
+	LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, heigth);
+	lp.setMargins(20, 0, 0, 0);
+	checkBox.setLayoutParams(lp);
+	checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
+			       if (buttonView.isChecked()) {
+                         Toast.makeText(getBaseContext(),  "checkeado "+buttonView.getId(),Toast.LENGTH_SHORT).show();
+                         ids_maquinas_seleccionadas.add(buttonView.getId());   
+			       }						
+			}
+          });
+	return checkBox;	
+	}
+	public ImageView crearImageView(int indice_maquina)
+	{
+		int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 140, getResources().getDisplayMetrics());
+		int	heigth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 140, getResources().getDisplayMetrics());
+		ImageView imagen = new ImageView(this);
+		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, heigth);
+		lp.setMargins(20, 0, 0, 0);	     
+		imagen.setLayoutParams(lp);
+	       imagen.setImageBitmap(maquina.getImagen(ids_maquinas.get(indice_maquina), this));
+	        return imagen;
+	}
 	public void llenar_encabezado()
 	{
 		titulo.setBackgroundResource(R.drawable.titulo_seleccion_de_maquinas);
@@ -223,10 +182,6 @@ public class SeleccionarMaquinaActivity extends Activity{
 		num_row+=1;
 		l1.addView(new TextView(this),num_row);
 		num_row+=1;
-	   
-	    
-	    
-		
 	}
 	
 }
